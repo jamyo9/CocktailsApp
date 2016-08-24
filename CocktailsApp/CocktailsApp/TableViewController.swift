@@ -1,0 +1,125 @@
+//
+//  ViewController.swift
+//  CocktailsApp
+//
+//  Created by Juan Alvarez on 9/8/16.
+//  Copyright © 2016 Juan Alvarez. All rights reserved.
+//
+
+import UIKit
+import CoreData
+
+class TableViewController: UITableViewController {
+    
+    @IBOutlet weak var cocktailTableView: UITableView!
+    
+    let cocktailsInstance = CocktailList.sharedInstance()
+    
+    var context: NSManagedObjectContext {
+        return CoreDataStack.sharedInstance.context
+    }
+    
+    var activityIndicator : UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRectMake(0, 0, 50, 50)) as UIActivityIndicatorView
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.hidden = false
+//        tableView.reloadData()
+        tabBarController?.tabBar.hidden = false
+        
+        CocktailList.sharedInstance().getCocktailsByType() { success, errorString in
+            if success == false {
+                //if let errorString = errorString {
+                if errorString != nil {
+                    dispatch_async(dispatch_get_main_queue(),{
+                        self.showError("", errorMessage: errorString!)
+                    })
+                }
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            self.reloadTable()
+        }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TableViewController.reloadTable), name: "", object: nil)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.startActivityIndicator()
+        
+//        self.cocktailTableView.delegate = self
+//        self.cocktailTableView.dataSource = self
+//        self.cocktailTableView.allowsMultipleSelection = false
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            self.stopActivityIndicator()
+        }
+    }
+    
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("CocktailTableViewCell", forIndexPath: indexPath) as! CocktailTableCell
+        let cocktail = cocktailsInstance.cocktails[indexPath.row]
+        if cocktail.drinkThumb != nil {
+            //print(cocktail)
+            cell.cocktailImage.image = UIImage(data: cocktail.drinkThumb!)
+        }
+        cell.textLable.text = cocktail.strDrink
+        return cell
+    }
+    
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return cocktailsInstance.cocktails.count
+    }
+    
+    func reloadTable() {
+        self.cocktailTableView.reloadData()
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "CocktailDetailFromListSegue" {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let cocktail = cocktailsInstance.cocktails[indexPath.item]
+                let controller = segue.destinationViewController as! CocktailDetailViewController
+                controller.cocktail = cocktail
+            }
+        }
+    }
+}
+
+extension TableViewController {
+    
+    /* show activity indicator */
+    func startActivityIndicator() {
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge
+        view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+    }
+    
+    /* hide acitivity indicator */
+    func stopActivityIndicator() {
+        activityIndicator.stopAnimating()
+    }
+    
+    func showError(errorCode: String, errorMessage: String?){
+        let titleString = "Error"
+        var errorString = ""
+        errorString = errorMessage!
+        showAlert(titleString, alertMessage: errorString, actionTitle: "Try again")
+    }
+    
+    //Function that configures and shows an alert
+    func showAlert(alertTitle: String, alertMessage: String, actionTitle: String){
+        
+        /* Configure the alert view to display the error */
+        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: actionTitle, style: .Default, handler: nil))
+        
+        /* Present the alert view */
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+}

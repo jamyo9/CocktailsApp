@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2Ob-Nv-B7O">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--Favorite Cocktails Collection View Controller-->
+        <scene sceneID="6dV-g0-uOu">
+            <objects>
+                <collectionViewController id="ScX-VF-ZFi" customClass="FavoriteCocktailsCollectionViewController" customModule="CocktailsApp" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="ERy-aY-G06">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="LXK-2R-xFs">
+                            <size key="itemSize" width="106" height="120"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="CocktailCellID" id="OO2-ne-UYb" customClass="CocktailCollectionCell" customModule="CocktailsApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="64" width="106" height="120"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="106" height="120"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uYV-l5-dvg">
+                                            <rect key="frame" x="0.0" y="0.0" width="106" height="120"/>
+                                        </imageView>
+                                        <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="32C-eU-pme">
+                                            <rect key="frame" x="35" y="41" width="37" height="37"/>
+                                        </activityIndicatorView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="No Image" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bU9-1d-TGI">
+                                            <rect key="frame" x="8" y="41" width="90" height="37"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                                <size key="customSize" width="106" height="120"/>
+                                <connections>
+                                    <outlet property="activityIndicator" destination="32C-eU-pme" id="LZ9-EP-Tqj"/>
+                                    <outlet property="noImageLabel" destination="bU9-1d-TGI" id="IfL-xd-emF"/>
+                                    <outlet property="photoView" destination="uYV-l5-dvg" id="TjG-gf-iQ5"/>
+                                    <segue destination="pu6-zQ-t4G" kind="show" identifier="CocktailDetailFromFavoritesSegue" id="I7s-dR-upb"/>
+                                </connections>
+                            </collectionViewCell>
+                        </cells>
+                        <connections>
+                            <outlet property="dataSource" destination="ScX-VF-ZFi" id="f3J-sB-oR9"/>
+                            <outlet property="delegate" destination="ScX-VF-ZFi" id="66F-KE-fLc"/>
+                        </connections>
+                    </collectionView>
+                    <navigationItem key="navigationItem" id="iAa-Ah-Nmp"/>
+                    <connections>
+                        <outlet property="collectionView" destination="ERy-aY-G06" id="7fz-hM-mqa"/>
+                    </connections>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ux3-rx-qmu" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2403" y="641"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="da9-Y9-61P">
+            <objects>
+                <navigationController id="VaM-2w-Iz2" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="" systemItem="favorites" id="vb2-H0-2YX"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="7yc-Zs-nyl">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="ScX-VF-ZFi" kind="relationship" relationship="rootViewController" id="SxF-0l-zqd"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AUh-0g-bs0" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1711" y="641"/>
+        </scene>
+        <!--Cocktail Search-->
+        <scene sceneID="7zX-fS-W0I">
+            <objects>
+                <tableViewController id="d0y-2I-fNf" customClass="TableViewController" customModule="CocktailsApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="111" sectionHeaderHeight="28" sectionFooterHeight="28" id="D8j-uR-awf">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="CocktailTableViewCell" rowHeight="111" id="Uay-PT-Mi9" customClass="CocktailTableCell" customModule="CocktailsApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="92" width="600" height="111"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Uay-PT-Mi9" id="9se-wa-Sc5">
+                                    <rect key="frame" x="0.0" y="0.0" width="567" height="110.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GFi-g8-GcC">
+                                            <rect key="frame" x="15" y="8" width="92" height="94.5"/>
+                                        </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yaJ-p3-Dff">
+                                            <rect key="frame" x="134" y="8" width="458" height="94.5"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="cocktailImage" destination="GFi-g8-GcC" id="9Er-tu-AWI"/>
+                                    <outlet property="textLable" destination="yaJ-p3-Dff" id="Avw-tD-XyL"/>
+                                    <segue destination="pu6-zQ-t4G" kind="show" identifier="CocktailDetailFromListSegue" id="KU0-zQ-ARr"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="d0y-2I-fNf" id="Iea-Kj-tiU"/>
+                            <outlet property="delegate" destination="d0y-2I-fNf" id="o7w-53-ZLK"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Cocktail Search" id="o6f-PQ-wMp"/>
+                    <connections>
+                        <outlet property="cocktailTableView" destination="D8j-uR-awf" id="6mF-ed-uYq"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="BW2-5B-juW" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2403" y="-54"/>
+        </scene>
+        <!--Search-->
+        <scene sceneID="7pf-mf-Fms">
+            <objects>
+                <navigationController id="lyM-7M-hNg" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Search" image="list" id="OjB-26-G2s"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="exe-cl-9BD">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="d0y-2I-fNf" kind="relationship" relationship="rootViewController" id="T7O-wv-sDO"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SOl-XL-PYF" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1711" y="-54"/>
+        </scene>
+        <!--Cocktail Detail View Controller-->
+        <scene sceneID="HUH-kF-21x">
+            <objects>
+                <viewController id="pu6-zQ-t4G" customClass="CocktailDetailViewController" customModule="CocktailsApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="cfS-uu-0Yc"/>
+                        <viewControllerLayoutGuide type="bottom" id="HWh-Kz-NtD"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="6Zo-cc-nPu">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="top" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZAK-tf-cNm">
+                                <rect key="frame" x="8" y="64" width="592" height="45"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="45" id="ofc-A3-Bdb"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5da-xB-mGe">
+                                <rect key="frame" x="20" y="322" width="560" height="278"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EOb-86-QYD">
+                                <rect key="frame" x="196" y="117" width="209" height="197"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="197" id="G8p-RS-WkC"/>
+                                    <constraint firstAttribute="width" constant="209" id="imn-WH-hks"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="ZAK-tf-cNm" firstAttribute="top" secondItem="cfS-uu-0Yc" secondAttribute="bottom" id="7UK-Et-Ga1"/>
+                            <constraint firstItem="EOb-86-QYD" firstAttribute="top" secondItem="ZAK-tf-cNm" secondAttribute="bottom" constant="8" id="BDk-dI-i8H"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="ZAK-tf-cNm" secondAttribute="trailing" constant="-20" id="PLB-OP-oRY"/>
+                            <constraint firstItem="5da-xB-mGe" firstAttribute="top" secondItem="EOb-86-QYD" secondAttribute="bottom" constant="8" id="TBo-S0-tvN"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="5da-xB-mGe" secondAttribute="trailing" id="VaF-pS-Xlg"/>
+                            <constraint firstItem="ZAK-tf-cNm" firstAttribute="leading" secondItem="6Zo-cc-nPu" secondAttribute="leadingMargin" constant="-12" id="Xs2-Dh-uaS"/>
+                            <constraint firstItem="5da-xB-mGe" firstAttribute="leading" secondItem="6Zo-cc-nPu" secondAttribute="leadingMargin" id="iAp-dS-KVu"/>
+                            <constraint firstItem="5da-xB-mGe" firstAttribute="bottom" secondItem="6Zo-cc-nPu" secondAttribute="bottomMargin" id="vMJ-eb-u0x"/>
+                            <constraint firstItem="EOb-86-QYD" firstAttribute="centerX" secondItem="6Zo-cc-nPu" secondAttribute="centerX" id="zxA-X6-xaK"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="12E-BN-ex7">
+                        <barButtonItem key="rightBarButtonItem" style="plain" systemItem="add" id="WVz-eW-9Yd">
+                            <connections>
+                                <action selector="favoriteAction:" destination="pu6-zQ-t4G" id="bjq-T6-LNt"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="cocktailImageView" destination="EOb-86-QYD" id="6cs-fE-5Pg"/>
+                        <outlet property="detailDescriptionLabel" destination="5da-xB-mGe" id="XQq-5r-lqW"/>
+                        <outlet property="saveButton" destination="WVz-eW-9Yd" id="7Gt-F5-Q8E"/>
+                        <outlet property="titleLabel" destination="ZAK-tf-cNm" id="aWg-bi-5p3"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="a08-9L-Kqc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3119" y="242"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="uaN-G2-Vrb">
+            <objects>
+                <tabBarController id="2Ob-Nv-B7O" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="Y9X-Xx-Khz">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="lyM-7M-hNg" kind="relationship" relationship="viewControllers" id="FdP-Ak-nYp"/>
+                        <segue destination="VaM-2w-Iz2" kind="relationship" relationship="viewControllers" id="rVd-w6-1e4"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cJP-d6-hzn" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="896" y="310"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="list" width="32" height="32"/>
+    </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="I7s-dR-upb"/>
+    </inferredMetricsTieBreakers>
+</document>
