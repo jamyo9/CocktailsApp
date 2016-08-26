@@ -13,61 +13,103 @@ class CocktailDetailViewController: UIViewController {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var cocktailImageView: UIImageView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var noImageLabel: UILabel!
     @IBOutlet weak var detailDescriptionLabel: UITextView!
-    @IBOutlet weak var saveButton: UIBarButtonItem!
+    
+//    @IBOutlet weak var saveButton: UIBarButtonItem!
+    var cocktailSaved: Bool!
     
     var context: NSManagedObjectContext {
         return CoreDataStack.sharedInstance.context
     }
     
-    var cocktail: Cocktail? {
-        didSet {
-            configureView()
-        }
-    }
-    
-    func configureView() {
-        if let detailCocktail = cocktail {
-            if let titleLabel = titleLabel, cocktailImageView = cocktailImageView, detailDescriptionLabel = detailDescriptionLabel {
-                titleLabel.text = detailCocktail.strDrink
-                titleLabel.font = UIFont.boldSystemFontOfSize(20.0)
-                if (detailCocktail.drinkThumb != nil) {
-                    cocktailImageView.image = UIImage(data: detailCocktail.drinkThumb!)
-                }
-                detailDescriptionLabel.text = self.createDescription()
-            }
-        }
-    }
+    var cocktail: Cocktail?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureView()
-        
+        cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((cocktail?.idDrink)!)
+        dispatch_async(dispatch_get_main_queue()) {
+            self.configureView()
+        }
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
-    
-    @IBAction func favoriteAction(sender: AnyObject) {
-        let actionButton = sender as! UIBarButtonItem
-        if actionButton.tag == 0 {
-            var cocktail = NSEntityDescription.insertNewObjectForEntityForName("Cocktail", inManagedObjectContext: self.context) as! Cocktail
-            cocktail = self.cocktail!
+    func favoriteAction(sender: AnyObject) {
+        if cocktailSaved == false {
+            CoreDataStack.sharedInstance.saveCocktail(self.cocktail!)
+            cocktailSaved = true
+        } else {
+//            self.context.deleteObject(self.cocktail!)
+            self.context.deleteObject(self.cocktail! as NSManagedObject)
             do {
                 try self.context.save()
-                actionButton.tag = 1
             } catch {}
-            self.saveButton = UIBarButtonItem(barButtonSystemItem: .Trash, target: self, action: Selector("favoriteAction"))
-        } else if actionButton.tag == 1 {
-            self.context.deleteObject(self.cocktail!)
-            actionButton.tag = 0
-            self.saveButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: Selector("favoriteAction"))
+            cocktailSaved = false
         }
+        configFavoriteCocktailButton()
     }
 }
 
 extension CocktailDetailViewController {
+    
+    func configureView() {
+        if let detailCocktail = cocktail {
+            if let titleLabel = titleLabel, cocktailImageView = cocktailImageView, detailDescriptionLabel = detailDescriptionLabel, activityIndicator = activityIndicator, noImageLabel = noImageLabel {
+                titleLabel.text = detailCocktail.strDrink
+                titleLabel.font = UIFont.boldSystemFontOfSize(20.0)
+//                if (detailCocktail.drinkThumb != nil) {
+//                    cocktailImageView.image = UIImage(data: detailCocktail.drinkThumb!)
+//                }
+                if (detailCocktail.drinkThumb == nil ) {
+                    if (detailCocktail.strDrinkThumb != nil) {
+                        CocktailsAPI.sharedInstance().taskForImageDownload(detailCocktail.strDrinkThumb!) { imageData, error in
+                            if let data = imageData {
+                                self.context.performBlock {
+                                    detailCocktail.drinkThumb = data
+                                    CoreDataStack.sharedInstance.saveContext()
+                                }
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    cocktailImageView.image = UIImage(data: data)
+                                    activityIndicator.stopAnimating()
+                                    noImageLabel.hidden = true
+                                }
+                            } else {
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    cocktailImageView.hidden = true
+                                    activityIndicator.stopAnimating()
+                                    noImageLabel.hidden = false
+                                }
+                            }
+                        }
+                    } else {
+                        dispatch_async(dispatch_get_main_queue()) {
+                            cocktailImageView.hidden = true
+                            activityIndicator.stopAnimating()
+                            noImageLabel.hidden = false
+                        }
+                    }
+                } else {
+                    cocktailImageView.image = UIImage(data: detailCocktail.drinkThumb!)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        cocktailImageView.hidden = false
+                        activityIndicator.stopAnimating()
+                        noImageLabel.hidden = true
+                    }
+                }
+                detailDescriptionLabel.text = self.createDescription()
+            }
+        }
+        
+        configFavoriteCocktailButton()
+    }
+    
+    func configFavoriteCocktailButton() {
+        if(cocktailSaved == true) {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Trash, target: self, action: #selector(CocktailDetailViewController.favoriteAction(_:)))
+        } else {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(CocktailDetailViewController.favoriteAction(_:)))
+        }
+    }
     
     func createDescription() -> String {
         var description: String = ""
@@ -96,8 +138,7 @@ extension CocktailDetailViewController {
                 description += " ⋅ " + strMeasure! + "\n"
             }
         }
-//        print(description)
+        //        print(description)
         return description
     }
-    
 }

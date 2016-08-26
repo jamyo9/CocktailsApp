@@ -25,14 +25,28 @@ class Cocktail: NSManagedObject {
     }
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
+        super.init(entity: entity, insertIntoManagedObjectContext: nil)
+    }
+    
+    init(cocktail: Cocktail, context: NSManagedObjectContext) {
+        let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
+        self.idDrink = cocktail.idDrink
+        self.strDrinkThumb = cocktail.strDrinkThumb
+        self.strDrink = cocktail.strDrink
+        self.strCategory = cocktail.strCategory
+        self.strAlcoholic = cocktail.strAlcoholic
+        self.strGlass = cocktail.strGlass
+        self.strInstructions = cocktail.strInstructions
+        
+//        self.ingredients = cocktail.ingredients
+//        self.measures = cocktail.measures
     }
     
     init(dictionary: [String:AnyObject], context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
-        super.init(entity: entity, insertIntoManagedObjectContext: context)
-        
-        self.idDrink = dictionary[Keys.ID] as? NSNumber
+        super.init(entity: entity, insertIntoManagedObjectContext: nil)
+        self.idDrink = NSNumber(int:Int32(dictionary[Keys.ID] as! String)!)
         self.strDrinkThumb = dictionary[Keys.DrinkThumb] as? String
         self.strDrink = dictionary[Keys.Drink] as? String
         self.strCategory = dictionary[Keys.Category] as? String
@@ -44,7 +58,7 @@ class Cocktail: NSManagedObject {
     init(idDrink: Int, strDrinkThumb: String, drinkThumb: NSData, strDrink: String, strCategory: String, strAlcoholic: String, strGlass: String, strInstructions: String, context: NSManagedObjectContext){
         
         let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
-        super.init(entity: entity, insertIntoManagedObjectContext: context)
+        super.init(entity: entity, insertIntoManagedObjectContext: nil)
         
         self.idDrink = idDrink as NSNumber
         self.strDrinkThumb = strDrinkThumb as String
@@ -62,7 +76,7 @@ class Cocktail: NSManagedObject {
     init(idDrink: Int, strDrinkThumb: String, drinkThumb: NSData, strDrink: String, strCategory: String, strAlcoholic: String, strGlass: String, strInstructions: String, ingredients: Set<Ingredient>, measures: Set<Measure>, context: NSManagedObjectContext){
         
         let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
-        super.init(entity: entity, insertIntoManagedObjectContext: context)
+        super.init(entity: entity, insertIntoManagedObjectContext: nil)
         
         self.idDrink = idDrink as NSNumber
         self.strDrinkThumb = strDrinkThumb as String

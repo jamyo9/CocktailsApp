@@ -22,14 +22,6 @@ class FavoriteCocktailsCollectionViewController: UIViewController, NSFetchedResu
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.allowsMultipleSelection = false
-        
         // Set the fetchedResultsController.delegate = self
         fetchedResultsController.delegate = self
         
@@ -37,6 +29,17 @@ class FavoriteCocktailsCollectionViewController: UIViewController, NSFetchedResu
         do {
             try fetchedResultsController.performFetch()
         } catch {}
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.allowsMultipleSelection = false
     }
     
     // MARK: - NSFetchedResultsController
@@ -59,31 +62,25 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
         return sectionInfo.numberOfObjects
     }
     
-    
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        
         let cocktail = fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CocktailCellID", forIndexPath: indexPath) as! CocktailCollectionCell
         
         cell.activityIndicator.startAnimating()
         cell.noImageLabel.hidden = true
         
-        if (cocktail.drinkThumb == nil ){
+        if (cocktail.drinkThumb == nil ) {
             if (cocktail.strDrinkThumb != nil) {
                 CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
-                    if let error = error {
-                        print("Error:\(error)")
-                    }
                     if let data = imageData {
                         self.context.performBlock {
                             cocktail.drinkThumb = data
                             CoreDataStack.sharedInstance.saveContext()
                         }
-        
-                        //Update the cell later, on the main thread
                         dispatch_async(dispatch_get_main_queue()) {
                             cell.photoView!.image = UIImage(data: data)
                             cell.activityIndicator.stopAnimating()
+                            cell.noImageLabel.hidden = true
                         }
                     } else {
                         dispatch_async(dispatch_get_main_queue()) {
@@ -101,11 +98,11 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
                 }
             }
         } else {
-//            cell.photoView!.image = UIImage(data: cocktail.drinkThumb!)
+            cell.photoView!.image = UIImage(data: cocktail.drinkThumb!)
             dispatch_async(dispatch_get_main_queue()) {
-                cell.photoView.hidden = true
+                cell.photoView.hidden = false
                 cell.activityIndicator.stopAnimating()
-                cell.noImageLabel.hidden = false
+                cell.noImageLabel.hidden = true
             }
         }
         

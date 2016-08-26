@@ -58,17 +58,13 @@ class CocktailList {
                         let cocktail = Cocktail(dictionary: cocktailDictionary, context: self.context)
                         cocktail.ingredients = ingredients
                         cocktail.measures = measures
-                        //if cocktail.drinkThumb == nil || cocktail.drinkThumb == "" {
-                            if cocktail.strDrinkThumb != nil && cocktail.strDrinkThumb != "" {
-                                CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
-                                    if let data = imageData {
-                                        self.context.performBlock {
-                                            cocktail.drinkThumb = data
-                                        }
-                                    }
-                                }
-                            }
-                        //}
+//                        if cocktail.strDrinkThumb != nil && cocktail.strDrinkThumb != "" {
+//                            CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
+//                                if let data = imageData {
+//                                    cocktail.drinkThumb = data
+//                                }
+//                            }
+//                        }
                         self.cocktails.append(cocktail)
                     }
                     
@@ -78,7 +74,6 @@ class CocktailList {
                     NSNotificationCenter.defaultCenter().postNotificationName("cocktailUpdateNotificationKey", object: self)
                     
                     completion(result:true, errorString: nil)
-                    print("Total cocktails: \(self.cocktails.count)")
                 } else {
                     // Server responded with success, but a nil array. Do not update local positions.
                     print("new cocktail data returned a nil array")

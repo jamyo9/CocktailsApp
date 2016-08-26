@@ -24,10 +24,9 @@ class TableViewController: UITableViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         tableView.hidden = false
-//        tableView.reloadData()
         tabBarController?.tabBar.hidden = false
         
-        CocktailList.sharedInstance().getCocktailsByType() { success, errorString in
+        cocktailsInstance.getCocktailsByType() { success, errorString in
             if success == false {
                 //if let errorString = errorString {
                 if errorString != nil {
@@ -35,11 +34,11 @@ class TableViewController: UITableViewController {
                         self.showError("", errorMessage: errorString!)
                     })
                 }
+            } else {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.reloadTable()
+                }
             }
-        }
-        
-        dispatch_async(dispatch_get_main_queue()) {
-            self.reloadTable()
         }
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TableViewController.reloadTable), name: "", object: nil)
@@ -50,9 +49,9 @@ class TableViewController: UITableViewController {
         
         self.startActivityIndicator()
         
-//        self.cocktailTableView.delegate = self
-//        self.cocktailTableView.dataSource = self
-//        self.cocktailTableView.allowsMultipleSelection = false
+        self.cocktailTableView.delegate = self
+        self.cocktailTableView.dataSource = self
+        self.cocktailTableView.allowsMultipleSelection = false
         
         dispatch_async(dispatch_get_main_queue()) {
             self.stopActivityIndicator()
@@ -62,8 +61,45 @@ class TableViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("CocktailTableViewCell", forIndexPath: indexPath) as! CocktailTableCell
         let cocktail = cocktailsInstance.cocktails[indexPath.row]
+        
+        if (cocktail.drinkThumb == nil ){
+            if (cocktail.strDrinkThumb != nil) {
+                CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
+                    if let data = imageData {
+                        self.context.performBlock {
+                            cocktail.drinkThumb = data
+                            CoreDataStack.sharedInstance.saveContext()
+                        }
+                        dispatch_async(dispatch_get_main_queue()) {
+                            cell.cocktailImage!.image = UIImage(data: data)
+                            cell.activityIndicator.stopAnimating()
+                            cell.noImageLabel.hidden = true
+                        }
+                    } else {
+                        dispatch_async(dispatch_get_main_queue()) {
+//                            cell.cocktailImage.hidden = true
+                            cell.activityIndicator.stopAnimating()
+                            cell.noImageLabel.hidden = false
+                        }
+                    }
+                }
+            } else {
+                dispatch_async(dispatch_get_main_queue()) {
+//                    cell.cocktailImage.hidden = true
+                    cell.activityIndicator.stopAnimating()
+                    cell.noImageLabel.hidden = false
+                }
+            }
+        } else {
+            cell.cocktailImage!.image = UIImage(data: cocktail.drinkThumb!)
+            dispatch_async(dispatch_get_main_queue()) {
+//                cell.cocktailImage.hidden = false
+                cell.activityIndicator.stopAnimating()
+                cell.noImageLabel.hidden = true
+            }
+        }
+        
         if cocktail.drinkThumb != nil {
-            //print(cocktail)
             cell.cocktailImage.image = UIImage(data: cocktail.drinkThumb!)
         }
         cell.textLable.text = cocktail.strDrink

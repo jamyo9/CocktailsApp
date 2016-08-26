@@ -119,6 +119,19 @@ class CoreDataStack {
         managedObjectContext.persistentStoreCoordinator = coordinator
         return managedObjectContext
     }()
+    
+    func cocktailAlreadySaved(idCocktail: NSNumber) -> Bool {
+        var fetchedCocktails:[Cocktail] = []
+        let cocktailFetchRequest = NSFetchRequest(entityName: "Cocktail")
+        cocktailFetchRequest.predicate = NSPredicate(format: "idDrink == %@", idCocktail)
+        do {
+            fetchedCocktails = try CoreDataStack.sharedInstance.context.executeFetchRequest(cocktailFetchRequest) as! [Cocktail]
+        } catch {}
+        if (fetchedCocktails.count > 0) {
+            return true
+        }
+        return false
+    }
 }
 
 
@@ -153,12 +166,7 @@ extension CoreDataStack {
     func autoSave(delayInSeconds : Int){
         
         if delayInSeconds > 0 {
-            do{
-                try saveContext()
-                print("Autosaving")
-            }catch{
-                print("Error while autosaving")
-            }
+            saveContext()
             
             let delayInNanoSeconds = UInt64(delayInSeconds) * NSEC_PER_SEC
             let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delayInNanoSeconds))
@@ -167,6 +175,15 @@ extension CoreDataStack {
                 self.autoSave(delayInSeconds)
             })
             
+        }
+    }
+    
+    func saveCocktail(cocktail: Cocktail) {
+        if !self.cocktailAlreadySaved(cocktail.idDrink!) {
+            _ = Cocktail(cocktail: cocktail, context: self.context)
+            do {
+                try self.context.save()
+            } catch {}
         }
     }
 }
