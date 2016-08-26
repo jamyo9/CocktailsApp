@@ -225,6 +225,14 @@ extension TableViewController: UISearchBarDelegate {
         }
         NSUserDefaults.standardUserDefaults().setInteger(selectedScope, forKey: "Category")
     }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchController.searchBar.selectedScopeButtonIndex = 0
+        searchController.searchBar.text = ""
+        
+        NSUserDefaults.standardUserDefaults().setObject("", forKey: "SearchText")
+        NSUserDefaults.standardUserDefaults().setInteger(0, forKey: "Category")
+    }
 }
 
 extension TableViewController: UISearchResultsUpdating {
