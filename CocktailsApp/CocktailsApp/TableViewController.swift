@@ -80,13 +80,12 @@ class TableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier("CocktailTableViewCell", forIndexPath: indexPath) as! CocktailTableCell
         let cocktail = cocktailsInstance.cocktails[indexPath.row]
         
+        cell.activityIndicator.startAnimating()
+        cell.cocktailImage.hidden = true
+        cell.noImageLabel.hidden = true
+        
         if (cocktail.drinkThumb == nil ) {
-            
-            cell.activityIndicator.startAnimating()
-            cell.cocktailImage.hidden = true
-            
             if (cocktail.strDrinkThumb != nil) {
-                
                 CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
                     if let data = imageData {
                         self.context.performBlock {
@@ -113,9 +112,9 @@ class TableViewController: UITableViewController {
                 }
             }
         } else {
-            cell.cocktailImage.hidden = false
-            cell.cocktailImage!.image = UIImage(data: cocktail.drinkThumb!)
             dispatch_async(dispatch_get_main_queue()) {
+                cell.cocktailImage.hidden = false
+                cell.cocktailImage!.image = UIImage(data: cocktail.drinkThumb!)
                 cell.activityIndicator.stopAnimating()
                 cell.noImageLabel.hidden = true
             }
