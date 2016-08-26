@@ -17,7 +17,6 @@ class CocktailDetailViewController: UIViewController {
     @IBOutlet weak var noImageLabel: UILabel!
     @IBOutlet weak var detailDescriptionLabel: UITextView!
     
-//    @IBOutlet weak var saveButton: UIBarButtonItem!
     var cocktailSaved: Bool!
     
     var context: NSManagedObjectContext {
@@ -40,10 +39,10 @@ class CocktailDetailViewController: UIViewController {
             cocktailSaved = true
         } else {
 //            self.context.deleteObject(self.cocktail!)
-            self.context.deleteObject(self.cocktail! as NSManagedObject)
-            do {
-                try self.context.save()
-            } catch {}
+//            do {
+//                try self.context.save()
+//            } catch {}
+            CoreDataStack.sharedInstance.deleteCocktails((self.cocktail?.idDrink)!)
             cocktailSaved = false
         }
         configFavoriteCocktailButton()
@@ -57,9 +56,7 @@ extension CocktailDetailViewController {
             if let titleLabel = titleLabel, cocktailImageView = cocktailImageView, detailDescriptionLabel = detailDescriptionLabel, activityIndicator = activityIndicator, noImageLabel = noImageLabel {
                 titleLabel.text = detailCocktail.strDrink
                 titleLabel.font = UIFont.boldSystemFontOfSize(20.0)
-//                if (detailCocktail.drinkThumb != nil) {
-//                    cocktailImageView.image = UIImage(data: detailCocktail.drinkThumb!)
-//                }
+                
                 if (detailCocktail.drinkThumb == nil ) {
                     if (detailCocktail.strDrinkThumb != nil) {
                         CocktailsAPI.sharedInstance().taskForImageDownload(detailCocktail.strDrinkThumb!) { imageData, error in
@@ -138,7 +135,6 @@ extension CocktailDetailViewController {
                 description += " ⋅ " + strMeasure! + "\n"
             }
         }
-        //        print(description)
         return description
     }
 }

@@ -121,16 +121,22 @@ class CoreDataStack {
     }()
     
     func cocktailAlreadySaved(idCocktail: NSNumber) -> Bool {
-        var fetchedCocktails:[Cocktail] = []
-        let cocktailFetchRequest = NSFetchRequest(entityName: "Cocktail")
-        cocktailFetchRequest.predicate = NSPredicate(format: "idDrink == %@", idCocktail)
-        do {
-            fetchedCocktails = try CoreDataStack.sharedInstance.context.executeFetchRequest(cocktailFetchRequest) as! [Cocktail]
-        } catch {}
-        if (fetchedCocktails.count > 0) {
+        if (getCocktailsById(idCocktail).count > 0) {
             return true
         }
         return false
+    }
+    
+    func getCocktailsById(idCocktail: NSNumber) -> [Cocktail] {
+        var fetchedCocktails:[Cocktail] = []
+        let cocktailFetchRequest = NSFetchRequest(entityName: "Cocktail")
+        cocktailFetchRequest.predicate = NSPredicate(format: "idDrink == %@", idCocktail)
+        cocktailFetchRequest.returnsObjectsAsFaults   = false
+        do {
+            fetchedCocktails = try CoreDataStack.sharedInstance.context.executeFetchRequest(cocktailFetchRequest) as! [Cocktail]
+        } catch {}
+        
+        return fetchedCocktails
     }
 }
 
@@ -142,9 +148,18 @@ extension CoreDataStack  {
         // delete all the objects in the db. This won't delete the files, it will
         // just leave empty tables.
         try coordinator.destroyPersistentStoreAtURL(dbURL, withType:NSSQLiteStoreType , options: nil)
-        
         try addStoreCoordinator(NSSQLiteStoreType, configuration: nil, storeURL: dbURL, options: nil)
-        
+    }
+    
+    func deleteCocktails(idCocktail: NSNumber) {
+        let fetchedCocktails = self.getCocktailsById(idCocktail)
+        for fetchedCocktail in fetchedCocktails {
+            self.context.deleteObject(fetchedCocktail)
+            
+            do {
+                try self.context.save()
+            } catch {}
+        }
     }
 }
 
@@ -164,7 +179,6 @@ extension CoreDataStack {
     }
     
     func autoSave(delayInSeconds : Int){
-        
         if delayInSeconds > 0 {
             saveContext()
             

@@ -47,15 +47,15 @@ class TableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.startActivityIndicator()
+//        self.startActivityIndicator()
         
         self.cocktailTableView.delegate = self
         self.cocktailTableView.dataSource = self
         self.cocktailTableView.allowsMultipleSelection = false
         
-        dispatch_async(dispatch_get_main_queue()) {
-            self.stopActivityIndicator()
-        }
+//        dispatch_async(dispatch_get_main_queue()) {
+//            self.stopActivityIndicator()
+//        }
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -64,6 +64,10 @@ class TableViewController: UITableViewController {
         
         if (cocktail.drinkThumb == nil ){
             if (cocktail.strDrinkThumb != nil) {
+                
+                cell.activityIndicator.startAnimating()
+                cell.cocktailImage.hidden = true
+                
                 CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
                     if let data = imageData {
                         self.context.performBlock {
@@ -71,13 +75,13 @@ class TableViewController: UITableViewController {
                             CoreDataStack.sharedInstance.saveContext()
                         }
                         dispatch_async(dispatch_get_main_queue()) {
+                            cell.cocktailImage.hidden = false
                             cell.cocktailImage!.image = UIImage(data: data)
                             cell.activityIndicator.stopAnimating()
                             cell.noImageLabel.hidden = true
                         }
                     } else {
                         dispatch_async(dispatch_get_main_queue()) {
-//                            cell.cocktailImage.hidden = true
                             cell.activityIndicator.stopAnimating()
                             cell.noImageLabel.hidden = false
                         }
@@ -85,23 +89,24 @@ class TableViewController: UITableViewController {
                 }
             } else {
                 dispatch_async(dispatch_get_main_queue()) {
-//                    cell.cocktailImage.hidden = true
+                    cell.cocktailImage.hidden = true
                     cell.activityIndicator.stopAnimating()
                     cell.noImageLabel.hidden = false
                 }
             }
         } else {
+            cell.cocktailImage.hidden = false
             cell.cocktailImage!.image = UIImage(data: cocktail.drinkThumb!)
             dispatch_async(dispatch_get_main_queue()) {
-//                cell.cocktailImage.hidden = false
                 cell.activityIndicator.stopAnimating()
                 cell.noImageLabel.hidden = true
             }
         }
         
-        if cocktail.drinkThumb != nil {
-            cell.cocktailImage.image = UIImage(data: cocktail.drinkThumb!)
-        }
+//        if cocktail.drinkThumb != nil {
+//            cell.cocktailImage.image = UIImage(data: cocktail.drinkThumb!)
+//        }
+        
         cell.textLable.text = cocktail.strDrink
         return cell
     }
@@ -128,18 +133,18 @@ class TableViewController: UITableViewController {
 extension TableViewController {
     
     /* show activity indicator */
-    func startActivityIndicator() {
-        activityIndicator.center = self.view.center
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge
-        view.addSubview(activityIndicator)
-        activityIndicator.startAnimating()
-    }
-    
-    /* hide acitivity indicator */
-    func stopActivityIndicator() {
-        activityIndicator.stopAnimating()
-    }
+//    func startActivityIndicator() {
+//        activityIndicator.center = self.view.center
+//        activityIndicator.hidesWhenStopped = true
+//        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge
+//        view.addSubview(activityIndicator)
+//        activityIndicator.startAnimating()
+//    }
+//    
+//    /* hide acitivity indicator */
+//    func stopActivityIndicator() {
+//        activityIndicator.stopAnimating()
+//    }
     
     func showError(errorCode: String, errorMessage: String?){
         let titleString = "Error"

@@ -14,32 +14,28 @@ class FavoriteCocktailsCollectionViewController: UIViewController, NSFetchedResu
     
     @IBOutlet weak var collectionView: UICollectionView!
     
-    let cocktailsInstance = CocktailList.sharedInstance()
-    
     var context: NSManagedObjectContext {
         return CoreDataStack.sharedInstance.context
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        // Set the fetchedResultsController.delegate = self
-        fetchedResultsController.delegate = self
         
-        // Invoke fetchedResultsController.performFetch(nil) here
+        self.collectionView.reloadData()
+        
         do {
             try fetchedResultsController.performFetch()
         } catch {}
-        
-        dispatch_async(dispatch_get_main_queue()) {
-            self.collectionView.reloadData()
-        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.allowsMultipleSelection = false
+        
+        fetchedResultsController.delegate = self
     }
     
     // MARK: - NSFetchedResultsController
@@ -109,15 +105,11 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
         return cell
     }
     
-//    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-//        self.context.deleteObject(fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail)
-//    }
-    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "CocktailDetailFromFavoritesSegue" {
             let detailsVC: CocktailDetailViewController = segue.destinationViewController as! CocktailDetailViewController
             let indexPath = self.collectionView.indexPathsForSelectedItems()![0]
-            detailsVC.cocktail = self.cocktailsInstance.cocktails[indexPath.row] as Cocktail
+            detailsVC.cocktail = (fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail)
         }
     }
 }
