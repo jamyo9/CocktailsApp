@@ -64,6 +64,16 @@ class TableViewController: UITableViewController {
         searchController.searchBar.scopeButtonTitles = ["All", "Cocktail", "Shot", "Punch", "Beer", "Shake"]
         tableView.tableHeaderView = searchController.searchBar
         
+        let category = NSUserDefaults.standardUserDefaults().integerForKey("Category")
+        let searchText = NSUserDefaults.standardUserDefaults().stringForKey("SearchText")
+        searchController.searchBar.selectedScopeButtonIndex = category
+        searchController.searchBar.text = searchText
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            if category != 0 || searchText != "" {
+                self.searchController.searchBar.becomeFirstResponder()
+            }
+        }
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -214,6 +224,7 @@ extension TableViewController: UISearchBarDelegate {
             
             filterContentForName(searchController.searchBar.text!)
         }
+        NSUserDefaults.standardUserDefaults().setInteger(selectedScope, forKey: "Category")
     }
 }
 
@@ -238,5 +249,6 @@ extension TableViewController: UISearchResultsUpdating {
         let searchBar = searchController.searchBar
         let category = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
         filterContentForCategory(category)
+        NSUserDefaults.standardUserDefaults().setObject(searchController.searchBar.text!, forKey: "SearchText")
     }
 }

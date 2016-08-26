@@ -13,6 +13,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     
+    func checkIfFirstLaunch() {
+        if !(NSUserDefaults.standardUserDefaults().boolForKey("launchedBefore")) {
+            NSUserDefaults.standardUserDefaults().setBool(true, forKey: "launchedBefore")
+            NSUserDefaults.standardUserDefaults().setInteger(0, forKey: "Category")
+            NSUserDefaults.standardUserDefaults().setObject("", forKey: "SearchText")
+            NSUserDefaults.standardUserDefaults().synchronize()
+        }
+    }
+    
+    func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        // Usually this is not overridden. Using the "did finish launching" method is more typical
+        checkIfFirstLaunch()
+        return true
+    }
+    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         return true
