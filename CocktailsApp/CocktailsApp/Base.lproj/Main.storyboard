@@ -113,7 +113,6 @@
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="No Image" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="r2F-b9-j08">
                                             <rect key="frame" x="24" y="37" width="74" height="37"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
@@ -254,6 +253,6 @@
         <image name="list" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="I7s-dR-upb"/>
+        <segue reference="KU0-zQ-ARr"/>
     </inferredMetricsTieBreakers>
 </document>

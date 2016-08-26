@@ -25,13 +25,42 @@ class CocktailDetailViewController: UIViewController {
     
     var cocktail: Cocktail?
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((cocktail?.idDrink)!)
-        dispatch_async(dispatch_get_main_queue()) {
-            self.configureView()
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if !(cocktail?.isCompleted())! {
+            
+            self.activityIndicator.startAnimating()
+            self.noImageLabel.hidden = true
+            
+            CocktailsAPI.sharedInstance().getCocktailById((cocktail?.idDrink)!) { success, arrayOfCocktailDictionaies, errorString in
+                if errorString == nil {
+                    if let cocktailDictionary = arrayOfCocktailDictionaies![0] as? [String: AnyObject] {
+                        self.cocktail = CocktailList.sharedInstance().parseCocktail(cocktailDictionary)
+                        
+                        self.cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((self.cocktail?.idDrink)!)
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.configureView()
+                        }
+                    } else {
+                        // Server responded with success, but a nil array. Do not update local positions.
+                        print("new cocktail data returned a nil array")
+                    }
+                } else {
+                    print("error getCocktailById()")
+                }
+            }
+        } else {
+            cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((cocktail?.idDrink)!)
+            dispatch_async(dispatch_get_main_queue()) {
+                self.configureView()
+            }
         }
     }
+    
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//    }
     
     func favoriteAction(sender: AnyObject) {
         if cocktailSaved == false {

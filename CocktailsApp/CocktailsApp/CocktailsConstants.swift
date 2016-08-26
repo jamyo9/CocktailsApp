@@ -42,6 +42,7 @@ extension CocktailsAPI {
         static let glassDrinkOption : String = "g"
         
         static let listMethod : String = "list.php"
+        static let listValue : String = "list"
         
 }
 

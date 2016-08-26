@@ -13,6 +13,8 @@ class TableViewController: UITableViewController {
     
     @IBOutlet weak var cocktailTableView: UITableView!
     
+    let searchController = UISearchController(searchResultsController: nil)
+    
     let cocktailsInstance = CocktailList.sharedInstance()
     
     var context: NSManagedObjectContext {
@@ -26,7 +28,7 @@ class TableViewController: UITableViewController {
         tableView.hidden = false
         tabBarController?.tabBar.hidden = false
         
-        cocktailsInstance.getCocktailsByType() { success, errorString in
+        cocktailsInstance.getCocktailsByName(searchController.searchBar.text!) { success, errorString in
             if success == false {
                 //if let errorString = errorString {
                 if errorString != nil {
@@ -47,26 +49,33 @@ class TableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        self.startActivityIndicator()
-        
         self.cocktailTableView.delegate = self
         self.cocktailTableView.dataSource = self
         self.cocktailTableView.allowsMultipleSelection = false
         
-//        dispatch_async(dispatch_get_main_queue()) {
-//            self.stopActivityIndicator()
-//        }
+        
+        // Setup the Search Controller
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.delegate = self
+        definesPresentationContext = true
+        searchController.dimsBackgroundDuringPresentation = false
+        
+//        // Setup the Scope Bar
+        searchController.searchBar.scopeButtonTitles = ["All", "Cocktail", "Shot", "Punch", "Beer", "Shake"]
+        tableView.tableHeaderView = searchController.searchBar
+        
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("CocktailTableViewCell", forIndexPath: indexPath) as! CocktailTableCell
         let cocktail = cocktailsInstance.cocktails[indexPath.row]
         
-        if (cocktail.drinkThumb == nil ){
+        if (cocktail.drinkThumb == nil ) {
+            
+            cell.activityIndicator.startAnimating()
+            cell.cocktailImage.hidden = true
+            
             if (cocktail.strDrinkThumb != nil) {
-                
-                cell.activityIndicator.startAnimating()
-                cell.cocktailImage.hidden = true
                 
                 CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
                     if let data = imageData {
@@ -89,7 +98,6 @@ class TableViewController: UITableViewController {
                 }
             } else {
                 dispatch_async(dispatch_get_main_queue()) {
-                    cell.cocktailImage.hidden = true
                     cell.activityIndicator.stopAnimating()
                     cell.noImageLabel.hidden = false
                 }
@@ -102,10 +110,6 @@ class TableViewController: UITableViewController {
                 cell.noImageLabel.hidden = true
             }
         }
-        
-//        if cocktail.drinkThumb != nil {
-//            cell.cocktailImage.image = UIImage(data: cocktail.drinkThumb!)
-//        }
         
         cell.textLable.text = cocktail.strDrink
         return cell
@@ -132,20 +136,6 @@ class TableViewController: UITableViewController {
 
 extension TableViewController {
     
-    /* show activity indicator */
-//    func startActivityIndicator() {
-//        activityIndicator.center = self.view.center
-//        activityIndicator.hidesWhenStopped = true
-//        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge
-//        view.addSubview(activityIndicator)
-//        activityIndicator.startAnimating()
-//    }
-//    
-//    /* hide acitivity indicator */
-//    func stopActivityIndicator() {
-//        activityIndicator.stopAnimating()
-//    }
-    
     func showError(errorCode: String, errorMessage: String?){
         let titleString = "Error"
         var errorString = ""
@@ -162,5 +152,91 @@ extension TableViewController {
         
         /* Present the alert view */
         self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func filterContentForCategory(category: String = "All") {
+        cocktailsInstance.cocktails = cocktailsInstance.cocktails.filter({( cocktail : Cocktail) -> Bool in
+            return (category == "All") || (cocktail.strCategory == category)
+        })
+        tableView.reloadData()
+    }
+    
+    func filterContentForName(searchText: String) {
+        cocktailsInstance.cocktails = cocktailsInstance.cocktails.filter({( cocktail : Cocktail) -> Bool in
+            return cocktail.strDrink!.lowercaseString.containsString(searchText.lowercaseString)
+        })
+        tableView.reloadData()
+    }
+}
+
+extension TableViewController: UISearchBarDelegate {
+    // MARK: - UISearchBar Delegate
+    func searchBar(searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
+        let searchBar = searchController.searchBar
+        var category = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
+        if category == "All" {
+            cocktailsInstance.getCocktailsByName(searchController.searchBar.text!) { success, errorString in
+                if success == false {
+                    //if let errorString = errorString {
+                    if errorString != nil {
+                        dispatch_async(dispatch_get_main_queue(),{
+                            self.showError("", errorMessage: errorString!)
+                        })
+                    }
+                } else {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.reloadTable()
+                    }
+                }
+            }
+            
+            filterContentForCategory(category)
+        } else {
+            if category == "Punch" {
+                category = "Punch / Party Drink"
+            } else if category == "Shake" {
+                category = "Milk / Float / Shake"
+            }
+            cocktailsInstance.getCocktailsByCategory(category) { success, errorString in
+                if success == false {
+                    //if let errorString = errorString {
+                    if errorString != nil {
+                        dispatch_async(dispatch_get_main_queue(),{
+                            self.showError("", errorMessage: errorString!)
+                        })
+                    }
+                } else {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.reloadTable()
+                    }
+                }
+            }
+            
+            filterContentForName(searchController.searchBar.text!)
+        }
+    }
+}
+
+extension TableViewController: UISearchResultsUpdating {
+    // MARK: - UISearchResultsUpdating Delegate
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
+        cocktailsInstance.getCocktailsByName(searchController.searchBar.text!) { success, errorString in
+            if success == false {
+                //if let errorString = errorString {
+                if errorString != nil {
+                    dispatch_async(dispatch_get_main_queue(),{
+                        self.showError("", errorMessage: errorString!)
+                    })
+                }
+            } else {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.reloadTable()
+                }
+            }
+        }
+        
+        let searchBar = searchController.searchBar
+        let category = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
+        filterContentForCategory(category)
     }
 }

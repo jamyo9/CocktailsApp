@@ -30,9 +30,65 @@ class CocktailsAPI {
         session = NSURLSession.sharedSession()
     }
     
-    func getCocktailsByType(typeOption: String, completionHandler: (success: Bool, arrayOfCocktailDictionaies: [AnyObject]?, errorString: String?) -> Void) {
+    func getCocktailsByName(cocktailName: String, completionHandler: (success: Bool, arrayOfCocktailDictionaies: [AnyObject]?, errorString: String?) -> Void) {
         
-        let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.searchMethod + "?" + CocktailsAPI.Constants.searchOption + "=" + typeOption
+        let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.searchMethod + "?" + CocktailsAPI.Constants.searchOption + "=" + cocktailName
+        
+        taskForGETMethod(baseURL) { JSONResult, error in
+            if let error = error {
+                // Set error string to localizedDescription in error
+                completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: error.localizedDescription)
+            } else {
+                // parse the json response which looks like the following:
+                if let arrayOfCocktailDicts = JSONResult.valueForKey("drinks") as? [AnyObject] {
+                    completionHandler(success: true, arrayOfCocktailDictionaies: arrayOfCocktailDicts, errorString: nil)
+                } else {
+                    completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: "No results from server.")
+                }
+            }
+        }
+    }
+    
+    func getCocktailsByCategory(cocktailCategory: String, completionHandler: (success: Bool, arrayOfCocktailDictionaies: [AnyObject]?, errorString: String?) -> Void) {
+        
+        let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.filterMethod + "?" + CocktailsAPI.Constants.categoryOption + "=" + cocktailCategory
+        
+        taskForGETMethod(baseURL) { JSONResult, error in
+            if let error = error {
+                // Set error string to localizedDescription in error
+                completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: error.localizedDescription)
+            } else {
+                // parse the json response which looks like the following:
+                if let arrayOfCocktailDicts = JSONResult.valueForKey("drinks") as? [AnyObject] {
+                    completionHandler(success: true, arrayOfCocktailDictionaies: arrayOfCocktailDicts, errorString: nil)
+                } else {
+                    completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: "No results from server.")
+                }
+            }
+        }
+    }
+    
+    func getCocktailCategories(completionHandler: (success: Bool, arrayOfCategoriesDictionary: [AnyObject]?, errorString: String?) -> Void) {
+        let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.listMethod + "?" + CocktailsAPI.Constants.categoryOption + "=" + CocktailsAPI.Constants.listValue
+        
+        taskForGETMethod(baseURL) { JSONResult, error in
+            if let error = error {
+                // Set error string to localizedDescription in error
+                completionHandler(success: false, arrayOfCategoriesDictionary: nil, errorString: error.localizedDescription)
+            } else {
+                // parse the json response which looks like the following:
+                if let arrayOfCategoriesDicts = JSONResult.valueForKey("drinks") as? [AnyObject] {
+                    completionHandler(success: true, arrayOfCategoriesDictionary: arrayOfCategoriesDicts, errorString: nil)
+                } else {
+                    completionHandler(success: false, arrayOfCategoriesDictionary: nil, errorString: "No results from server.")
+                }
+            }
+        }
+    }
+    
+    func getCocktailById(idDrink: NSNumber, completionHandler: (success: Bool, arrayOfCocktailDictionaies: [AnyObject]?, errorString: String?) -> Void) {
+        
+        let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.lookupMethod + "?" + CocktailsAPI.Constants.lookupOption + "=" + String(idDrink)
         
         taskForGETMethod(baseURL) { JSONResult, error in
             if let error = error {
@@ -62,7 +118,7 @@ class CocktailsAPI {
     
     func taskForGETMethod(baseUrl: String, completionHandler: (result: AnyObject!, error: NSError?) -> Void) -> NSURLSessionDataTask {
         
-        let url = NSURL(string: baseUrl)!
+        let url = NSURL(string: baseUrl.stringByAddingPercentEncodingWithAllowedCharacters( NSCharacterSet.URLQueryAllowedCharacterSet())!)!
         let request = NSMutableURLRequest(URL: url)
         let task = session.dataTaskWithRequest(request) {data, response, downloadError in
             if let error = downloadError {

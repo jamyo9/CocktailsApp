@@ -26,6 +26,15 @@ class Cocktail: NSManagedObject {
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: nil)
+        
+        self.idDrink = 0
+        self.strDrinkThumb = ""
+        self.drinkThumb = nil
+        self.strDrink = ""
+        self.strCategory = ""
+        self.strAlcoholic = ""
+        self.strGlass = ""
+        self.strInstructions = ""
     }
     
     init(cocktail: Cocktail, context: NSManagedObjectContext) {
@@ -38,9 +47,24 @@ class Cocktail: NSManagedObject {
         self.strAlcoholic = cocktail.strAlcoholic
         self.strGlass = cocktail.strGlass
         self.strInstructions = cocktail.strInstructions
+    }
+    
+    init(idDrink: NSNumber, strDrink: String, strDrinkThumb: AnyObject, context: NSManagedObjectContext) {
+        let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
+        super.init(entity: entity, insertIntoManagedObjectContext: nil)
         
-//        self.ingredients = cocktail.ingredients
-//        self.measures = cocktail.measures
+        self.idDrink = idDrink
+        self.strDrink = strDrink
+        if strDrinkThumb is NSNull {
+            self.strDrinkThumb = ""
+        } else {
+            self.strDrinkThumb = strDrinkThumb as? String
+        }
+        self.drinkThumb = nil
+        self.strCategory = ""
+        self.strAlcoholic = ""
+        self.strGlass = ""
+        self.strInstructions = ""
     }
     
     init(dictionary: [String:AnyObject], context: NSManagedObjectContext) {
@@ -91,11 +115,6 @@ class Cocktail: NSManagedObject {
         self.measures = measures
     }
     
-//    override func prepareForDeletion() {
-//        super.prepareForDeletion()
-//        ImageCache.sharedInstance.deleteImage(idDrink!)
-//    }
-    
     func hasIngredients() -> Bool {
         return ingredients!.count != 0
     }
@@ -104,4 +123,7 @@ class Cocktail: NSManagedObject {
         return measures!.count != 0
     }
     
+    func isCompleted() -> Bool {
+        return hasIngredients() && hasMeasures() && self.idDrink != 0 && self.strDrinkThumb != "" && self.drinkThumb != nil && self.strDrink != "" && self.strCategory != "" && self.strAlcoholic != "" && self.strGlass != "" && self.strInstructions != ""
+    }
 }

@@ -109,7 +109,8 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
         if segue.identifier == "CocktailDetailFromFavoritesSegue" {
             let detailsVC: CocktailDetailViewController = segue.destinationViewController as! CocktailDetailViewController
             let indexPath = self.collectionView.indexPathsForSelectedItems()![0]
-            detailsVC.cocktail = (fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail)
+            let cocktail = (fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail)
+            detailsVC.cocktail = cocktail
         }
     }
 }

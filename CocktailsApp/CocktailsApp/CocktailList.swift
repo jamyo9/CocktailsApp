@@ -29,9 +29,9 @@ class CocktailList {
         cocktails.removeAll(keepCapacity: false)
     }
     
-    func getCocktailsByType(completion: (result: Bool, errorString: String?) -> Void) {
+    func getCocktailsByName(cocktailName: String, completion: (result: Bool, errorString: String?) -> Void) {
         
-        CocktailsAPI.sharedInstance().getCocktailsByType("") { success, arrayOfCocktailDictionaies, errorString in
+        CocktailsAPI.sharedInstance().getCocktailsByName(cocktailName) { success, arrayOfCocktailDictionaies, errorString in
             if errorString == nil {
                 if let array = arrayOfCocktailDictionaies as? [[String: AnyObject]] {
                     
@@ -39,33 +39,7 @@ class CocktailList {
                     
                     // Update collection of position with the new data from Parse.
                     for cocktailDictionary in array {
-                        
-                        var ingredients = Set<Ingredient>()
-                        var measures = Set<Measure>()
-                        
-                        for index in 1...15 {
-                            let ingredient = Ingredient(strIngredient: (cocktailDictionary["strIngredient" + String(index)] as? String)!, context: self.context)
-                            if ingredient.strIngredient != "" && ingredient.strIngredient != " " {
-                                ingredients.insert(ingredient)
-                            }
-                            let measure = Measure(strMeasure: (cocktailDictionary["strMeasure" + String(index)] as? String)!, context: self.context)
-                            if measure.strMeasure != "" && measure.strMeasure != " " {
-                                measures.insert(measure)
-                            }
-                        }
-                        
-                        // create a position object and add it to this object's collection.
-                        let cocktail = Cocktail(dictionary: cocktailDictionary, context: self.context)
-                        cocktail.ingredients = ingredients
-                        cocktail.measures = measures
-//                        if cocktail.strDrinkThumb != nil && cocktail.strDrinkThumb != "" {
-//                            CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
-//                                if let data = imageData {
-//                                    cocktail.drinkThumb = data
-//                                }
-//                            }
-//                        }
-                        self.cocktails.append(cocktail)
+                        self.cocktails.append(self.parseCocktail(cocktailDictionary))
                     }
                     
                     self.sortList()
@@ -87,6 +61,38 @@ class CocktailList {
         }
     }
     
+    func getCocktailsByCategory(cocktailCategory: String, completion: (result: Bool, errorString: String?) -> Void) {
+        
+        CocktailsAPI.sharedInstance().getCocktailsByCategory(cocktailCategory) { success, arrayOfCocktailDictionaies, errorString in
+            if errorString == nil {
+                if let array = arrayOfCocktailDictionaies as? [[String: AnyObject]] {
+                    
+                    self.reset()
+                    
+                    // Update collection of position with the new data from Parse.
+                    for cocktailDictionary in array {
+                        let cocktail = Cocktail(idDrink: NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!), strDrink: (cocktailDictionary["strDrink"] as? String)!, strDrinkThumb: cocktailDictionary["strDrinkThumb"]!, context: self.context)
+                        self.cocktails.append(cocktail)
+                    }
+                    
+                    self.sortList()
+                    
+                    // Send a notification indicating new position data has been obtained from Parse.
+                    NSNotificationCenter.defaultCenter().postNotificationName("cocktailUpdateNotificationKey", object: self)
+                    
+                    completion(result:true, errorString: nil)
+                } else {
+                    // Server responded with success, but a nil array. Do not update local positions.
+                    print("new cocktail data returned a nil array")
+                    completion(result:true, errorString: nil)
+                }
+            } else {
+                print("error getCocktailsByCategory()")
+                completion(result:false, errorString: errorString)
+            }
+        }
+    }
+    
     /* sort list by date */
     func sortList() {
         self.cocktails.sortInPlace {
@@ -99,5 +105,27 @@ class CocktailList {
         for cocktail in cocktails {
             print("\(cocktail.strDrink)")
         }
+    }
+    
+    func parseCocktail(cocktailDictionary: [String: AnyObject]) -> Cocktail {
+        var ingredients = Set<Ingredient>()
+        var measures = Set<Measure>()
+        
+        for index in 1...15 {
+            let ingredient = Ingredient(strIngredient: (cocktailDictionary["strIngredient" + String(index)] as? String)!, context: self.context)
+            if ingredient.strIngredient != "" && ingredient.strIngredient != " " {
+                ingredients.insert(ingredient)
+            }
+            let measure = Measure(strMeasure: (cocktailDictionary["strMeasure" + String(index)] as? String)!, context: self.context)
+            if measure.strMeasure != "" && measure.strMeasure != " " {
+                measures.insert(measure)
+            }
+        }
+        
+        // create a position object and add it to this object's collection.
+        let cocktail = Cocktail(dictionary: cocktailDictionary, context: self.context)
+        cocktail.ingredients = ingredients
+        cocktail.measures = measures
+        return cocktail
     }
 }
