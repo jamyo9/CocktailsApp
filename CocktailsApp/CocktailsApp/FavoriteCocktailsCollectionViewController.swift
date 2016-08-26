@@ -62,11 +62,12 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
         let cocktail = fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CocktailCellID", forIndexPath: indexPath) as! CocktailCollectionCell
         
-        cell.activityIndicator.startAnimating()
-        cell.noImageLabel.hidden = true
-        
         if (cocktail.drinkThumb == nil ) {
-            if (cocktail.strDrinkThumb != nil) {
+            
+            cell.activityIndicator.startAnimating()
+            cell.noImageLabel.hidden = true
+            
+            if (cocktail.strDrinkThumb != nil && cocktail.strDrinkThumb != "") {
                 CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
                     if let data = imageData {
                         self.context.performBlock {
@@ -101,7 +102,7 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
                 cell.noImageLabel.hidden = true
             }
         }
-        
+
         return cell
     }
     
