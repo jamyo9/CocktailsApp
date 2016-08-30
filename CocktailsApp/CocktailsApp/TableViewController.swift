@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  TableViewController.swift
 //  CocktailsApp
 //
 //  Created by Juan Alvarez on 9/8/16.
@@ -60,7 +60,7 @@ class TableViewController: UITableViewController {
         definesPresentationContext = true
         searchController.dimsBackgroundDuringPresentation = false
         
-//        // Setup the Scope Bar
+        // Setup the Scope Bar
         searchController.searchBar.scopeButtonTitles = ["All", "Cocktail", "Shot", "Punch", "Beer", "Shake"]
         tableView.tableHeaderView = searchController.searchBar
         
@@ -81,8 +81,8 @@ class TableViewController: UITableViewController {
         let cocktail = cocktailsInstance.cocktails[indexPath.row]
         
         cell.activityIndicator.startAnimating()
-        cell.cocktailImage.hidden = true
-        cell.noImageLabel.hidden = true
+//        cell.cocktailImage.hidden = true
+//        cell.noImageLabel.hidden = true
         
         if (cocktail.drinkThumb == nil ) {
             if (cocktail.strDrinkThumb != nil) {
@@ -93,30 +93,32 @@ class TableViewController: UITableViewController {
                             CoreDataStack.sharedInstance.saveContext()
                         }
                         dispatch_async(dispatch_get_main_queue()) {
-                            cell.cocktailImage.hidden = false
+//                            cell.cocktailImage.hidden = false
                             cell.cocktailImage!.image = UIImage(data: data)
                             cell.activityIndicator.stopAnimating()
-                            cell.noImageLabel.hidden = true
+//                            cell.noImageLabel.hidden = true
                         }
                     } else {
                         dispatch_async(dispatch_get_main_queue()) {
                             cell.activityIndicator.stopAnimating()
-                            cell.noImageLabel.hidden = false
+//                            cell.noImageLabel.hidden = false
+                            cell.cocktailImage.image = UIImage(named: "no-image")
                         }
                     }
                 }
             } else {
                 dispatch_async(dispatch_get_main_queue()) {
                     cell.activityIndicator.stopAnimating()
-                    cell.noImageLabel.hidden = false
+//                    cell.noImageLabel.hidden = false
+                    cell.cocktailImage.image = UIImage(named: "no-image")
                 }
             }
         } else {
             dispatch_async(dispatch_get_main_queue()) {
-                cell.cocktailImage.hidden = false
+//                cell.cocktailImage.hidden = false
                 cell.cocktailImage!.image = UIImage(data: cocktail.drinkThumb!)
                 cell.activityIndicator.stopAnimating()
-                cell.noImageLabel.hidden = true
+//                cell.noImageLabel.hidden = true
             }
         }
         
@@ -149,7 +151,7 @@ extension TableViewController {
         let titleString = "Error"
         var errorString = ""
         errorString = errorMessage!
-        showAlert(titleString, alertMessage: errorString, actionTitle: "Try again")
+        showAlert(titleString, alertMessage: errorString, actionTitle: "Cancel")
     }
     
     //Function that configures and shows an alert
@@ -157,7 +159,10 @@ extension TableViewController {
         
         /* Configure the alert view to display the error */
         let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: actionTitle, style: .Default, handler: nil))
+        let cancelAction = UIAlertAction(title: actionTitle, style: .Cancel) { (action) in
+            self.searchBarCancelButtonClicked(self.searchController.searchBar)
+        }
+        alert.addAction(cancelAction)
         
         /* Present the alert view */
         self.presentViewController(alert, animated: true, completion: nil)

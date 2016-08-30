@@ -65,7 +65,6 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
         if (cocktail.drinkThumb == nil ) {
             
             cell.activityIndicator.startAnimating()
-            cell.noImageLabel.hidden = true
             
             if (cocktail.strDrinkThumb != nil && cocktail.strDrinkThumb != "") {
                 CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
@@ -77,29 +76,23 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
                         dispatch_async(dispatch_get_main_queue()) {
                             cell.photoView!.image = UIImage(data: data)
                             cell.activityIndicator.stopAnimating()
-                            cell.noImageLabel.hidden = true
                         }
                     } else {
                         dispatch_async(dispatch_get_main_queue()) {
-                            cell.photoView.hidden = true
                             cell.activityIndicator.stopAnimating()
-                            cell.noImageLabel.hidden = false
-                        }
+                            cell.photoView.image = UIImage(named: "no-image")                        }
                     }
                 }
             } else {
                 dispatch_async(dispatch_get_main_queue()) {
-                    cell.photoView.hidden = true
                     cell.activityIndicator.stopAnimating()
-                    cell.noImageLabel.hidden = false
+                    cell.photoView.image = UIImage(named: "no-image")
                 }
             }
         } else {
             cell.photoView!.image = UIImage(data: cocktail.drinkThumb!)
             dispatch_async(dispatch_get_main_queue()) {
-                cell.photoView.hidden = false
                 cell.activityIndicator.stopAnimating()
-                cell.noImageLabel.hidden = true
             }
         }
 

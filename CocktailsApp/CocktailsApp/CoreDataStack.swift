@@ -135,7 +135,6 @@ class CoreDataStack {
         do {
             fetchedCocktails = try CoreDataStack.sharedInstance.context.executeFetchRequest(cocktailFetchRequest) as! [Cocktail]
         } catch {}
-        
         return fetchedCocktails
     }
 }
@@ -178,7 +177,7 @@ extension CoreDataStack {
         }
     }
     
-    func autoSave(delayInSeconds : Int){
+    func autoSave(delayInSeconds : Int) {
         if delayInSeconds > 0 {
             saveContext()
             
@@ -194,7 +193,8 @@ extension CoreDataStack {
     
     func saveCocktail(cocktail: Cocktail) {
         if !self.cocktailAlreadySaved(cocktail.idDrink!) {
-            _ = Cocktail(cocktail: cocktail, context: self.context)
+            let cocktail = Cocktail(cocktail: cocktail, context: self.context)
+            print(cocktail)
             do {
                 try self.context.save()
             } catch {}

@@ -13,5 +13,5 @@ class CocktailTableCell: UITableViewCell {
     @IBOutlet weak var cocktailImage: UIImageView!
     @IBOutlet weak var textLable: UILabel!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var noImageLabel: UILabel!
+    
 }

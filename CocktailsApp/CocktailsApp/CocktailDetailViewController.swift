@@ -14,7 +14,7 @@ class CocktailDetailViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var cocktailImageView: UIImageView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var noImageLabel: UILabel!
+//    @IBOutlet weak var noImageLabel: UILabel!
     @IBOutlet weak var detailDescriptionLabel: UITextView!
     
     var cocktailSaved: Bool!
@@ -31,7 +31,6 @@ class CocktailDetailViewController: UIViewController {
         if !(cocktail?.isCompleted())! {
             
             self.activityIndicator.startAnimating()
-            self.noImageLabel.hidden = true
             
             CocktailsAPI.sharedInstance().getCocktailById((cocktail?.idDrink)!) { success, arrayOfCocktailDictionaies, errorString in
                 if errorString == nil {
@@ -44,10 +43,10 @@ class CocktailDetailViewController: UIViewController {
                         }
                     } else {
                         // Server responded with success, but a nil array. Do not update local positions.
-                        print("new cocktail data returned a nil array")
+                        self.showError("", errorMessage: "Cocktail data returned a nil")
                     }
                 } else {
-                    print("error getCocktailById()")
+                    self.showError("", errorMessage: "Error Getting Cocktail")
                 }
             }
         } else {
@@ -58,19 +57,11 @@ class CocktailDetailViewController: UIViewController {
         }
     }
     
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//    }
-    
     func favoriteAction(sender: AnyObject) {
         if cocktailSaved == false {
             CoreDataStack.sharedInstance.saveCocktail(self.cocktail!)
             cocktailSaved = true
         } else {
-//            self.context.deleteObject(self.cocktail!)
-//            do {
-//                try self.context.save()
-//            } catch {}
             CoreDataStack.sharedInstance.deleteCocktails((self.cocktail?.idDrink)!)
             cocktailSaved = false
         }
@@ -82,7 +73,7 @@ extension CocktailDetailViewController {
     
     func configureView() {
         if let detailCocktail = cocktail {
-            if let titleLabel = titleLabel, cocktailImageView = cocktailImageView, detailDescriptionLabel = detailDescriptionLabel, activityIndicator = activityIndicator, noImageLabel = noImageLabel {
+            if let titleLabel = titleLabel, cocktailImageView = cocktailImageView, detailDescriptionLabel = detailDescriptionLabel, activityIndicator = activityIndicator {
                 titleLabel.text = detailCocktail.strDrink
                 titleLabel.font = UIFont.boldSystemFontOfSize(20.0)
                 
@@ -97,29 +88,24 @@ extension CocktailDetailViewController {
                                 dispatch_async(dispatch_get_main_queue()) {
                                     cocktailImageView.image = UIImage(data: data)
                                     activityIndicator.stopAnimating()
-                                    noImageLabel.hidden = true
                                 }
                             } else {
                                 dispatch_async(dispatch_get_main_queue()) {
-                                    cocktailImageView.hidden = true
                                     activityIndicator.stopAnimating()
-                                    noImageLabel.hidden = false
+                                    cocktailImageView.image = UIImage(named: "no-image")
                                 }
                             }
                         }
                     } else {
                         dispatch_async(dispatch_get_main_queue()) {
-                            cocktailImageView.hidden = true
                             activityIndicator.stopAnimating()
-                            noImageLabel.hidden = false
+                            cocktailImageView.image = UIImage(named: "no-image")
                         }
                     }
                 } else {
                     cocktailImageView.image = UIImage(data: detailCocktail.drinkThumb!)
                     dispatch_async(dispatch_get_main_queue()) {
-                        cocktailImageView.hidden = false
                         activityIndicator.stopAnimating()
-                        noImageLabel.hidden = true
                     }
                 }
                 detailDescriptionLabel.text = self.createDescription()
@@ -166,4 +152,24 @@ extension CocktailDetailViewController {
         }
         return description
     }
+    
+    func showError(errorCode: String, errorMessage: String?){
+        let titleString = "Error"
+        var errorString = ""
+        errorString = errorMessage!
+        showAlert(titleString, alertMessage: errorString, actionTitle: "Cancel")
+    }
+    
+    //Function that configures and shows an alert
+    func showAlert(alertTitle: String, alertMessage: String, actionTitle: String){
+        
+        /* Configure the alert view to display the error */
+        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .Alert)
+        let cancelAction = UIAlertAction(title: actionTitle, style: .Cancel, handler: nil)
+        alert.addAction(cancelAction)
+        
+        /* Present the alert view */
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
 }

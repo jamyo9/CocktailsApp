@@ -53,9 +53,8 @@ class CocktailList {
                     print("new cocktail data returned a nil array")
                     completion(result:true, errorString: nil)
                 }
-            }
-            else {
-                print("error getCocktailsByType()")
+            } else {
+                print("error getCocktailsByName()")
                 completion(result:false, errorString: errorString)
             }
         }

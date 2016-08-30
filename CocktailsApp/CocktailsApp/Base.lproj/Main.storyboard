@@ -33,19 +33,12 @@
                                         <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="32C-eU-pme">
                                             <rect key="frame" x="35" y="41" width="37" height="37"/>
                                         </activityIndicatorView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="No Image" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bU9-1d-TGI">
-                                            <rect key="frame" x="8" y="41" width="90" height="37"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
                                 <size key="customSize" width="106" height="120"/>
                                 <connections>
                                     <outlet property="activityIndicator" destination="32C-eU-pme" id="LZ9-EP-Tqj"/>
-                                    <outlet property="noImageLabel" destination="bU9-1d-TGI" id="IfL-xd-emF"/>
                                     <outlet property="photoView" destination="uYV-l5-dvg" id="TjG-gf-iQ5"/>
                                     <segue destination="pu6-zQ-t4G" kind="show" identifier="CocktailDetailFromFavoritesSegue" id="I7s-dR-upb"/>
                                 </connections>
@@ -111,17 +104,11 @@
                                             <rect key="frame" x="44" y="36" width="37" height="37"/>
                                             <color key="color" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         </activityIndicatorView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="No Image" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="r2F-b9-j08">
-                                            <rect key="frame" x="24" y="37" width="74" height="37"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="activityIndicator" destination="p55-dK-Enb" id="0gi-ly-ASi"/>
                                     <outlet property="cocktailImage" destination="GFi-g8-GcC" id="9Er-tu-AWI"/>
-                                    <outlet property="noImageLabel" destination="r2F-b9-j08" id="zWe-dL-8Bf"/>
                                     <outlet property="textLable" destination="yaJ-p3-Dff" id="Avw-tD-XyL"/>
                                     <segue destination="pu6-zQ-t4G" kind="show" identifier="CocktailDetailFromListSegue" id="KU0-zQ-ARr"/>
                                 </connections>
@@ -191,19 +178,12 @@
                                     <constraint firstAttribute="width" constant="209" id="imn-WH-hks"/>
                                 </constraints>
                             </imageView>
-                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="tI7-56-W9r">
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="tI7-56-W9r">
                                 <rect key="frame" x="282" y="197" width="37" height="37"/>
                             </activityIndicatorView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Image" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MS7-Gu-THZ">
-                                <rect key="frame" x="247.5" y="200.5" width="107" height="30"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="MS7-Gu-THZ" firstAttribute="centerX" secondItem="EOb-86-QYD" secondAttribute="centerX" id="6lh-Af-u1Y"/>
                             <constraint firstItem="ZAK-tf-cNm" firstAttribute="top" secondItem="cfS-uu-0Yc" secondAttribute="bottom" id="7UK-Et-Ga1"/>
                             <constraint firstItem="EOb-86-QYD" firstAttribute="top" secondItem="ZAK-tf-cNm" secondAttribute="bottom" constant="8" id="BDk-dI-i8H"/>
                             <constraint firstAttribute="trailingMargin" secondItem="ZAK-tf-cNm" secondAttribute="trailing" constant="-20" id="PLB-OP-oRY"/>
@@ -212,7 +192,6 @@
                             <constraint firstItem="ZAK-tf-cNm" firstAttribute="leading" secondItem="6Zo-cc-nPu" secondAttribute="leadingMargin" constant="-12" id="Xs2-Dh-uaS"/>
                             <constraint firstItem="5da-xB-mGe" firstAttribute="leading" secondItem="6Zo-cc-nPu" secondAttribute="leadingMargin" id="iAp-dS-KVu"/>
                             <constraint firstItem="tI7-56-W9r" firstAttribute="centerY" secondItem="EOb-86-QYD" secondAttribute="centerY" id="keE-Ay-uHi"/>
-                            <constraint firstItem="MS7-Gu-THZ" firstAttribute="centerY" secondItem="EOb-86-QYD" secondAttribute="centerY" id="sDr-d1-nRB"/>
                             <constraint firstItem="5da-xB-mGe" firstAttribute="bottom" secondItem="6Zo-cc-nPu" secondAttribute="bottomMargin" id="vMJ-eb-u0x"/>
                             <constraint firstItem="tI7-56-W9r" firstAttribute="centerX" secondItem="EOb-86-QYD" secondAttribute="centerX" id="x7d-fh-eS3"/>
                             <constraint firstItem="EOb-86-QYD" firstAttribute="centerX" secondItem="6Zo-cc-nPu" secondAttribute="centerX" id="zxA-X6-xaK"/>
@@ -223,7 +202,6 @@
                         <outlet property="activityIndicator" destination="tI7-56-W9r" id="4Pe-4k-M39"/>
                         <outlet property="cocktailImageView" destination="EOb-86-QYD" id="6cs-fE-5Pg"/>
                         <outlet property="detailDescriptionLabel" destination="5da-xB-mGe" id="XQq-5r-lqW"/>
-                        <outlet property="noImageLabel" destination="MS7-Gu-THZ" id="UT4-qu-9qg"/>
                         <outlet property="titleLabel" destination="ZAK-tf-cNm" id="aWg-bi-5p3"/>
                     </connections>
                 </viewController>
@@ -254,6 +232,6 @@
         <image name="list" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="KU0-zQ-ARr"/>
+        <segue reference="I7s-dR-upb"/>
     </inferredMetricsTieBreakers>
 </document>
