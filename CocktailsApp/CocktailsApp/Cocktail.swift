@@ -48,8 +48,8 @@ class Cocktail: NSManagedObject {
         self.strGlass = cocktail.strGlass
         self.strInstructions = cocktail.strInstructions
         
-        self.ingredients = cocktail.ingredients
-        self.measures = cocktail.measures
+//        self.ingredients = cocktail.ingredients
+//        self.measures = cocktail.measures
     }
     
     init(idDrink: NSNumber, strDrink: String, strDrinkThumb: AnyObject, context: NSManagedObjectContext) {
