@@ -59,7 +59,7 @@ class CoreDataStack {
         
         self.dbURL = docUrl.URLByAppendingPathComponent("CocktailsModel.sqlite")
         
-        
+        print(self.dbURL)
         // Options for migration
         let options = [NSInferMappingModelAutomaticallyOption : true, NSMigratePersistentStoresAutomaticallyOption : true]
         
@@ -187,17 +187,14 @@ extension CoreDataStack {
             dispatch_after(time, dispatch_get_main_queue(), {
                 self.autoSave(delayInSeconds)
             })
-            
         }
     }
     
     func saveCocktail(cocktail: Cocktail) {
         if !self.cocktailAlreadySaved(cocktail.idDrink!) {
             let cocktail = Cocktail(cocktail: cocktail, context: self.context)
+            saveContext()
             print(cocktail)
-            do {
-                try self.context.save()
-            } catch {}
         }
     }
 }

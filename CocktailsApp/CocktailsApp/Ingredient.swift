@@ -16,18 +16,18 @@ class Ingredient: NSManagedObject {
         super.init(entity: entity, insertIntoManagedObjectContext: nil)
     }
     
-    init(strIngredient: String, context: NSManagedObjectContext) {
+    convenience init(strIngredient: String, context: NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entityForName("Ingredient", inManagedObjectContext: context)!
-        super.init(entity: entity, insertIntoManagedObjectContext: nil)
+        self.init(entity: entity, insertIntoManagedObjectContext: nil)
         
         self.strIngredient = strIngredient as String
     }
     
-    init(ingredient: Ingredient, context: NSManagedObjectContext) {
+    convenience init(ingredient: Ingredient, context: NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entityForName("Ingredient", inManagedObjectContext: context)!
-        super.init(entity: entity, insertIntoManagedObjectContext: context)
+        self.init(entity: entity, insertIntoManagedObjectContext: context)
         
         self.strIngredient = ingredient.strIngredient
     }
