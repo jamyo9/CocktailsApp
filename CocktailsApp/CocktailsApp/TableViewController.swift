@@ -30,8 +30,6 @@ class TableViewController: UITableViewController {
         tableView.hidden = false
         tabBarController?.tabBar.hidden = false
         
-//        let favoriteCocktails = NSUserDefaults.standardUserDefaults().dictionaryForKey("FavoriteCocktails")
-        
         cocktailsInstance.getCocktailsByName(searchController.searchBar.text!) { success, errorString in
             if success == false {
                 //if let errorString = errorString {
@@ -136,10 +134,6 @@ class TableViewController: UITableViewController {
                 let cocktail = cocktailsInstance.cocktails[indexPath.item]
                 let controller = segue.destinationViewController as! CocktailDetailViewController
                 controller.cocktail = cocktail
-                
-                do {
-                    try CoreDataStack.sharedInstance.dropNotFavoritesExceptCurrent(cocktail.idDrink!)
-                } catch {}
             }
         }
     }

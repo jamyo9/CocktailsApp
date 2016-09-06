@@ -204,14 +204,14 @@ class CocktailsAPI {
     func isSuccess(data: NSData?, response: NSURLResponse?, error: NSError?, completionHandler: (data: NSData?, error: NSError?) -> Void) -> Bool {
         
         guard error == nil else {
-            print("There was an error with your request: \(error)")
+            NSLog("There was an error with your request: \(error)")
             completionHandler(data: nil, error: error)
             return false
         }
         
         guard let data = data else {
             let errorMessage = "No data was returned by the request!"
-            print(errorMessage)
+            NSLog(errorMessage)
             let userInfo = [NSLocalizedDescriptionKey : errorMessage]
             completionHandler(data: nil, error: NSError(domain: "isSuccess", code: 1, userInfo: userInfo))
             return false
@@ -227,7 +227,7 @@ class CocktailsAPI {
                 errorMessage = "Your request returned an invalid response!"
             }
             
-            print(errorMessage)
+            NSLog(errorMessage)
             let userInfo = [NSLocalizedDescriptionKey : errorMessage]
             completionHandler(data: data, error: NSError(domain: "isSuccess", code: 1, userInfo: userInfo))
             return false

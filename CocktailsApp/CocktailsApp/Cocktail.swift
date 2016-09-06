@@ -84,7 +84,7 @@ class Cocktail: NSManagedObject {
         self.isFavorite = false
     }
     
-    convenience init(dictionary: [String:AnyObject], context: NSManagedObjectContext) {
+    convenience init(dictionary: [String:AnyObject], isFavorite: Bool, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
         self.init(entity: entity, insertIntoManagedObjectContext: context)
         
@@ -96,7 +96,7 @@ class Cocktail: NSManagedObject {
         self.strGlass = dictionary[Keys.Glass] as? String
         self.strInstructions = dictionary[Keys.Instructions] as? String
         
-        self.isFavorite = false
+        self.isFavorite = isFavorite
     }
     
     func hasIngredients() -> Bool {

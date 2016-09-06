@@ -26,7 +26,7 @@ class CocktailDetailViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
+                
         if !(cocktail?.isCompleted())! {
             
             self.activityIndicator.startAnimating()
@@ -36,7 +36,6 @@ class CocktailDetailViewController: UIViewController {
                     if let cocktailDictionary = arrayOfCocktailDictionaies![0] as? [String: AnyObject] {
                         self.cocktail = CocktailList.sharedInstance().parseCocktail(cocktailDictionary)
                         
-//                        self.cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((self.cocktail?.idDrink)!)
                         dispatch_async(dispatch_get_main_queue()) {
                             self.configureView()
                         }
@@ -49,7 +48,6 @@ class CocktailDetailViewController: UIViewController {
                 }
             }
         } else {
-//            cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((cocktail?.idDrink)!)
             dispatch_async(dispatch_get_main_queue()) {
                 self.configureView()
             }
@@ -63,6 +61,7 @@ class CocktailDetailViewController: UIViewController {
         } else {
             CoreDataStack.sharedInstance.deleteCocktails((self.cocktail?.idDrink)!)
         }
+        
         configFavoriteCocktailButton()
     }
 }
@@ -79,10 +78,8 @@ extension CocktailDetailViewController {
                     if (detailCocktail.strDrinkThumb != nil) {
                         CocktailsAPI.sharedInstance().taskForImageDownload(detailCocktail.strDrinkThumb!) { imageData, error in
                             if let data = imageData {
-//                                self.context.performBlock {
                                     detailCocktail.drinkThumb = data
                                     CoreDataStack.sharedInstance.saveContext()
-//                                }
                                 dispatch_async(dispatch_get_main_queue()) {
                                     cocktailImageView.image = UIImage(data: data)
                                     activityIndicator.stopAnimating()

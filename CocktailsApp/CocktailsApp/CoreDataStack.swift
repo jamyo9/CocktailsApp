@@ -28,14 +28,14 @@ class CoreDataStack {
         
         // Assumes the model is in the main bundle
         guard let modelURL = NSBundle.mainBundle().URLForResource(modelName, withExtension: "momd") else {
-            print("Unable to find \(modelName)in the main bundle")
+            NSLog("Unable to find \(modelName)in the main bundle")
             return nil}
         
         self.modelURL = modelURL
         
         // Try to create the model from the URL
         guard let model = NSManagedObjectModel(contentsOfURL: modelURL) else{
-            print("unable to create a model from \(modelURL)")
+            NSLog("unable to create a model from \(modelURL)")
             return nil
         }
         self.model = model
@@ -53,13 +53,12 @@ class CoreDataStack {
         let fm = NSFileManager.defaultManager()
         
         guard let  docUrl = fm.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first else{
-            print("Unable to reach the documents folder")
+            NSLog("Unable to reach the documents folder")
             return nil
         }
         
         self.dbURL = docUrl.URLByAppendingPathComponent("CocktailsModel.sqlite")
         
-//        print(self.dbURL)
         // Options for migration
         let options = [NSInferMappingModelAutomaticallyOption : true, NSMigratePersistentStoresAutomaticallyOption : true]
         
@@ -67,7 +66,7 @@ class CoreDataStack {
             try addStoreCoordinator(NSSQLiteStoreType, configuration: nil, storeURL: dbURL, options: options)
             
         }catch{
-            print("unable to add store at \(dbURL)")
+            NSLog("unable to add store at \(dbURL)")
         }
     }
     
@@ -241,6 +240,7 @@ extension CoreDataStack {
 //            let cocktail = Cocktail(cocktail: cocktail, context: self.context)
 //            saveContext()
 //        }
+//        CoreDataStack.sharedInstance.deleteCocktails(cocktail.idDrink!)
         cocktail.isFavorite = true
         saveContext()
     }

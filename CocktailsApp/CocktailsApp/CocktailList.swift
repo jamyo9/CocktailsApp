@@ -10,6 +10,7 @@ import CoreData
 
 class CocktailList {
     var cocktails: [Cocktail] = []
+    var favoriteCocktails: [Cocktail] = []
     
     var context: NSManagedObjectContext {
         return CoreDataStack.sharedInstance.context
@@ -27,9 +28,10 @@ class CocktailList {
     
     func reset() {
         cocktails.removeAll(keepCapacity: false)
+        favoriteCocktails.removeAll(keepCapacity: false)
+        
         for cocktail in CoreDataStack.sharedInstance.getFavoriteCocktails() {
-            cocktails.append(cocktail)
-            print(cocktail.idDrink)
+            favoriteCocktails.append(cocktail)
         }
     }
     
@@ -44,9 +46,10 @@ class CocktailList {
                     // Update collection of position with the new data from Parse.
                     for cocktailDictionary in array {
                         let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
-                        
-                        if !self.findById(idDrink) {
-                            self.cocktails.append(self.parseCocktail(cocktailDictionary))
+                        if self.findFavoriteById(idDrink) {
+                            self.cocktails.append(self.getCocktailFavoriteById(idDrink)!)
+                        } else {
+                            self.cocktails.append(self.parseCocktail(cocktailDictionary, isFavorite: false))
                         }
                     }
                     
@@ -58,11 +61,11 @@ class CocktailList {
                     completion(result:true, errorString: nil)
                 } else {
                     // Server responded with success, but a nil array. Do not update local positions.
-                    print("new cocktail data returned a nil array")
+                    NSLog("new cocktail data returned a nil array")
                     completion(result:true, errorString: nil)
                 }
             } else {
-                print("error getCocktailsByName()")
+                NSLog("error getCocktailsByName()")
                 completion(result:false, errorString: errorString)
             }
         }
@@ -79,10 +82,10 @@ class CocktailList {
                     // Update collection of position with the new data from Parse.
                     for cocktailDictionary in array {
                         let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
-                        
-                        if !self.findById(idDrink) {
-                            let cocktail = Cocktail(idDrink: idDrink, strDrink: (cocktailDictionary["strDrink"] as? String)!, strDrinkThumb: cocktailDictionary["strDrinkThumb"]!, context: self.context)
-                            self.cocktails.append(cocktail)
+                        if self.findFavoriteById(idDrink) {
+                            self.cocktails.append(self.getCocktailFavoriteById(idDrink)!)
+                        } else {
+                            self.cocktails.append(Cocktail(idDrink: idDrink, strDrink: (cocktailDictionary["strDrink"] as? String)!, strDrinkThumb: cocktailDictionary["strDrinkThumb"]!, context: self.context))
                         }
                     }
                     
@@ -94,11 +97,11 @@ class CocktailList {
                     completion(result:true, errorString: nil)
                 } else {
                     // Server responded with success, but a nil array. Do not update local positions.
-                    print("new cocktail data returned a nil array")
+                    NSLog("new cocktail data returned a nil array")
                     completion(result:true, errorString: nil)
                 }
             } else {
-                print("error getCocktailsByCategory()")
+                NSLog("error getCocktailsByCategory()")
                 completion(result:false, errorString: errorString)
             }
         }
@@ -119,33 +122,50 @@ class CocktailList {
     }
     
     func parseCocktail(cocktailDictionary: [String: AnyObject]) -> Cocktail {
+        let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
+        return self.parseCocktail(cocktailDictionary, isFavorite: self.findFavoriteById(idDrink))
+    }
+    
+    func parseCocktail(cocktailDictionary: [String: AnyObject], isFavorite: Bool) -> Cocktail {
         var ingredients = Set<Ingredient>()
         var measures = Set<Measure>()
         
         for index in 1...15 {
-            let ingredient = Ingredient(strIngredient: (cocktailDictionary["strIngredient" + String(index)] as? String)!, context: self.context)
-            if ingredient.strIngredient != "" && ingredient.strIngredient != " " {
+            let ingredientStr = (cocktailDictionary["strIngredient" + String(index)] as? String)!
+            if ingredientStr != "" && ingredientStr != " " {
+                let ingredient = Ingredient(strIngredient: ingredientStr, context: self.context)
                 ingredients.insert(ingredient)
             }
-            let measure = Measure(strMeasure: (cocktailDictionary["strMeasure" + String(index)] as? String)!, context: self.context)
-            if measure.strMeasure != "" && measure.strMeasure != " " {
+            
+            let measureStr = (cocktailDictionary["strMeasure" + String(index)] as? String)!
+            if measureStr != "" && measureStr != " " {
+                let measure = Measure(strMeasure: measureStr, context: self.context)
                 measures.insert(measure)
             }
         }
         
         // create a position object and add it to this object's collection.
-        let cocktail = Cocktail(dictionary: cocktailDictionary, context: self.context)
+        let cocktail = Cocktail(dictionary: cocktailDictionary, isFavorite: isFavorite, context: self.context)
         cocktail.ingredients = ingredients
         cocktail.measures = measures
         return cocktail
     }
     
-    func findById(idDrink: NSNumber) -> Bool {
-        for cocktail in self.cocktails {
+    func findFavoriteById(idDrink: NSNumber) -> Bool {
+        for cocktail in self.favoriteCocktails {
             if cocktail.idDrink == idDrink {
                 return true
             }
         }
         return false
+    }
+    
+    func getCocktailFavoriteById(idDrink: NSNumber) -> Cocktail? {
+        for cocktail in self.favoriteCocktails {
+            if cocktail.idDrink == idDrink {
+                return cocktail
+            }
+        }
+        return nil
     }
 }
