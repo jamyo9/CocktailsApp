@@ -14,10 +14,9 @@ class CocktailDetailViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var cocktailImageView: UIImageView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-//    @IBOutlet weak var noImageLabel: UILabel!
     @IBOutlet weak var detailDescriptionLabel: UITextView!
     
-    var cocktailSaved: Bool!
+//    var cocktailSaved: Bool!
     
     var context: NSManagedObjectContext {
         return CoreDataStack.sharedInstance.context
@@ -37,7 +36,7 @@ class CocktailDetailViewController: UIViewController {
                     if let cocktailDictionary = arrayOfCocktailDictionaies![0] as? [String: AnyObject] {
                         self.cocktail = CocktailList.sharedInstance().parseCocktail(cocktailDictionary)
                         
-                        self.cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((self.cocktail?.idDrink)!)
+//                        self.cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((self.cocktail?.idDrink)!)
                         dispatch_async(dispatch_get_main_queue()) {
                             self.configureView()
                         }
@@ -50,7 +49,7 @@ class CocktailDetailViewController: UIViewController {
                 }
             }
         } else {
-            cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((cocktail?.idDrink)!)
+//            cocktailSaved = CoreDataStack.sharedInstance.cocktailAlreadySaved((cocktail?.idDrink)!)
             dispatch_async(dispatch_get_main_queue()) {
                 self.configureView()
             }
@@ -58,12 +57,11 @@ class CocktailDetailViewController: UIViewController {
     }
     
     func favoriteAction(sender: AnyObject) {
-        if cocktailSaved == false {
-            CoreDataStack.sharedInstance.saveCocktail(self.cocktail!)
-            cocktailSaved = true
+        sender.object
+        if self.cocktail?.isFavorite == false {
+            CoreDataStack.sharedInstance.saveCocktailAsFavorite(self.cocktail!)
         } else {
             CoreDataStack.sharedInstance.deleteCocktails((self.cocktail?.idDrink)!)
-            cocktailSaved = false
         }
         configFavoriteCocktailButton()
     }
@@ -81,10 +79,10 @@ extension CocktailDetailViewController {
                     if (detailCocktail.strDrinkThumb != nil) {
                         CocktailsAPI.sharedInstance().taskForImageDownload(detailCocktail.strDrinkThumb!) { imageData, error in
                             if let data = imageData {
-                                self.context.performBlock {
+//                                self.context.performBlock {
                                     detailCocktail.drinkThumb = data
                                     CoreDataStack.sharedInstance.saveContext()
-                                }
+//                                }
                                 dispatch_async(dispatch_get_main_queue()) {
                                     cocktailImageView.image = UIImage(data: data)
                                     activityIndicator.stopAnimating()
@@ -116,7 +114,7 @@ extension CocktailDetailViewController {
     }
     
     func configFavoriteCocktailButton() {
-        if(cocktailSaved == true) {
+        if(self.cocktail?.isFavorite == true) {
             navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Trash, target: self, action: #selector(CocktailDetailViewController.favoriteAction(_:)))
         } else {
             navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(CocktailDetailViewController.favoriteAction(_:)))

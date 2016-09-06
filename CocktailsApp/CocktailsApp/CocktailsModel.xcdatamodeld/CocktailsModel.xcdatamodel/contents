@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10174" systemVersion="15G31" minimumToolsVersion="Xcode 7.0">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10174" systemVersion="15G1004" minimumToolsVersion="Xcode 7.0">
     <entity name="Cocktail" representedClassName=".Cocktail" syncable="YES">
         <attribute name="drinkThumb" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="idDrink" optional="YES" attributeType="Integer 64" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="isFavorite" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="strAlcoholic" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="strCategory" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="strDrink" optional="YES" attributeType="String" syncable="YES"/>
@@ -21,7 +22,7 @@
         <relationship name="cocktail" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Cocktail" inverseName="measures" inverseEntity="Cocktail" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Cocktail" positionX="-63" positionY="-18" width="128" height="195"/>
+        <element name="Cocktail" positionX="-63" positionY="-18" width="128" height="210"/>
         <element name="Ingredient" positionX="-54" positionY="54" width="128" height="75"/>
         <element name="Measure" positionX="-36" positionY="63" width="128" height="75"/>
     </elements>

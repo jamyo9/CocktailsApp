@@ -13,13 +13,13 @@ import CoreData
 class Ingredient: NSManagedObject {
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
-        super.init(entity: entity, insertIntoManagedObjectContext: nil)
+        super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
     convenience init(strIngredient: String, context: NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entityForName("Ingredient", inManagedObjectContext: context)!
-        self.init(entity: entity, insertIntoManagedObjectContext: nil)
+        self.init(entity: entity, insertIntoManagedObjectContext: context)
         
         self.strIngredient = strIngredient as String
     }

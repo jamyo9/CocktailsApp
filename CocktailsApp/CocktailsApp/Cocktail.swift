@@ -35,6 +35,7 @@ class Cocktail: NSManagedObject {
         self.strAlcoholic = ""
         self.strGlass = ""
         self.strInstructions = ""
+        self.isFavorite = false
     }
     
     convenience init(cocktail: Cocktail, context: NSManagedObjectContext) {
@@ -47,6 +48,8 @@ class Cocktail: NSManagedObject {
         self.strAlcoholic = cocktail.strAlcoholic
         self.strGlass = cocktail.strGlass
         self.strInstructions = cocktail.strInstructions
+        
+        self.isFavorite = false
         
 //        var ingredients = Set<Ingredient>()
 //        for ingredient in cocktail.ingredients! {
@@ -63,7 +66,7 @@ class Cocktail: NSManagedObject {
     
     convenience init(idDrink: NSNumber, strDrink: String, strDrinkThumb: AnyObject, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
-        self.init(entity: entity, insertIntoManagedObjectContext: nil)
+        self.init(entity: entity, insertIntoManagedObjectContext: context)
         
         self.idDrink = idDrink
         self.strDrink = strDrink
@@ -77,11 +80,13 @@ class Cocktail: NSManagedObject {
         self.strAlcoholic = ""
         self.strGlass = ""
         self.strInstructions = ""
+        
+        self.isFavorite = false
     }
     
     convenience init(dictionary: [String:AnyObject], context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
-        self.init(entity: entity, insertIntoManagedObjectContext: nil)
+        self.init(entity: entity, insertIntoManagedObjectContext: context)
         
         self.idDrink = NSNumber(int:Int32(dictionary[Keys.ID] as! String)!)
         self.strDrinkThumb = dictionary[Keys.DrinkThumb] as? String
@@ -90,6 +95,8 @@ class Cocktail: NSManagedObject {
         self.strAlcoholic = dictionary[Keys.Alcoholic] as? String
         self.strGlass = dictionary[Keys.Glass] as? String
         self.strInstructions = dictionary[Keys.Instructions] as? String
+        
+        self.isFavorite = false
     }
     
     func hasIngredients() -> Bool {

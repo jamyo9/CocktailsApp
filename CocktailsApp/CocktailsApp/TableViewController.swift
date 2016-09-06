@@ -21,12 +21,16 @@ class TableViewController: UITableViewController {
         return CoreDataStack.sharedInstance.context
     }
     
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
     var activityIndicator : UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRectMake(0, 0, 50, 50)) as UIActivityIndicatorView
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         tableView.hidden = false
         tabBarController?.tabBar.hidden = false
+        
+//        let favoriteCocktails = NSUserDefaults.standardUserDefaults().dictionaryForKey("FavoriteCocktails")
         
         cocktailsInstance.getCocktailsByName(searchController.searchBar.text!) { success, errorString in
             if success == false {
@@ -81,8 +85,6 @@ class TableViewController: UITableViewController {
         let cocktail = cocktailsInstance.cocktails[indexPath.row]
         
         cell.activityIndicator.startAnimating()
-//        cell.cocktailImage.hidden = true
-//        cell.noImageLabel.hidden = true
         
         if (cocktail.drinkThumb == nil ) {
             if (cocktail.strDrinkThumb != nil) {
@@ -93,15 +95,12 @@ class TableViewController: UITableViewController {
                             CoreDataStack.sharedInstance.saveContext()
                         }
                         dispatch_async(dispatch_get_main_queue()) {
-//                            cell.cocktailImage.hidden = false
                             cell.cocktailImage!.image = UIImage(data: data)
                             cell.activityIndicator.stopAnimating()
-//                            cell.noImageLabel.hidden = true
                         }
                     } else {
                         dispatch_async(dispatch_get_main_queue()) {
                             cell.activityIndicator.stopAnimating()
-//                            cell.noImageLabel.hidden = false
                             cell.cocktailImage.image = UIImage(named: "no-image")
                         }
                     }
@@ -109,16 +108,13 @@ class TableViewController: UITableViewController {
             } else {
                 dispatch_async(dispatch_get_main_queue()) {
                     cell.activityIndicator.stopAnimating()
-//                    cell.noImageLabel.hidden = false
                     cell.cocktailImage.image = UIImage(named: "no-image")
                 }
             }
         } else {
             dispatch_async(dispatch_get_main_queue()) {
-//                cell.cocktailImage.hidden = false
                 cell.cocktailImage!.image = UIImage(data: cocktail.drinkThumb!)
                 cell.activityIndicator.stopAnimating()
-//                cell.noImageLabel.hidden = true
             }
         }
         
@@ -140,6 +136,10 @@ class TableViewController: UITableViewController {
                 let cocktail = cocktailsInstance.cocktails[indexPath.item]
                 let controller = segue.destinationViewController as! CocktailDetailViewController
                 controller.cocktail = cocktail
+                
+                do {
+                    try CoreDataStack.sharedInstance.dropNotFavoritesExceptCurrent(cocktail.idDrink!)
+                } catch {}
             }
         }
     }

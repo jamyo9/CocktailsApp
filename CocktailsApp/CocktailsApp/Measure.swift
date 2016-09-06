@@ -19,7 +19,7 @@ class Measure: NSManagedObject {
     convenience init(strMeasure: String, context: NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entityForName("Measure", inManagedObjectContext: context)!
-        self.init(entity: entity, insertIntoManagedObjectContext: nil)
+        self.init(entity: entity, insertIntoManagedObjectContext: context)
         
         self.strMeasure = strMeasure as String
     }

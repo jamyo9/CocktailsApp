@@ -27,6 +27,10 @@ class CocktailList {
     
     func reset() {
         cocktails.removeAll(keepCapacity: false)
+        for cocktail in CoreDataStack.sharedInstance.getFavoriteCocktails() {
+            cocktails.append(cocktail)
+            print(cocktail.idDrink)
+        }
     }
     
     func getCocktailsByName(cocktailName: String, completion: (result: Bool, errorString: String?) -> Void) {
@@ -39,7 +43,11 @@ class CocktailList {
                     
                     // Update collection of position with the new data from Parse.
                     for cocktailDictionary in array {
-                        self.cocktails.append(self.parseCocktail(cocktailDictionary))
+                        let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
+                        
+                        if !self.findById(idDrink) {
+                            self.cocktails.append(self.parseCocktail(cocktailDictionary))
+                        }
                     }
                     
                     self.sortList()
@@ -70,8 +78,12 @@ class CocktailList {
                     
                     // Update collection of position with the new data from Parse.
                     for cocktailDictionary in array {
-                        let cocktail = Cocktail(idDrink: NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!), strDrink: (cocktailDictionary["strDrink"] as? String)!, strDrinkThumb: cocktailDictionary["strDrinkThumb"]!, context: self.context)
-                        self.cocktails.append(cocktail)
+                        let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
+                        
+                        if !self.findById(idDrink) {
+                            let cocktail = Cocktail(idDrink: idDrink, strDrink: (cocktailDictionary["strDrink"] as? String)!, strDrinkThumb: cocktailDictionary["strDrinkThumb"]!, context: self.context)
+                            self.cocktails.append(cocktail)
+                        }
                     }
                     
                     self.sortList()
@@ -102,7 +114,7 @@ class CocktailList {
     /* debug helper function */
     func printList() {
         for cocktail in cocktails {
-            print("\(cocktail.strDrink)")
+            print("\(cocktail.idDrink)")
         }
     }
     
@@ -126,5 +138,14 @@ class CocktailList {
         cocktail.ingredients = ingredients
         cocktail.measures = measures
         return cocktail
+    }
+    
+    func findById(idDrink: NSNumber) -> Bool {
+        for cocktail in self.cocktails {
+            if cocktail.idDrink == idDrink {
+                return true
+            }
+        }
+        return false
     }
 }

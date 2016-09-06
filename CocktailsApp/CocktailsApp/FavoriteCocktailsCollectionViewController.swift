@@ -43,8 +43,11 @@ class FavoriteCocktailsCollectionViewController: UIViewController, NSFetchedResu
         
         let fetchRequest = NSFetchRequest(entityName: "Cocktail")
         fetchRequest.sortDescriptors = []
+        fetchRequest.predicate = NSPredicate(format: "isFavorite == %@", true)
+        fetchRequest.returnsObjectsAsFaults   = false
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.context, sectionNameKeyPath: nil, cacheName: nil)
+        
         fetchedResultsController.delegate = self
         
         return fetchedResultsController
@@ -69,10 +72,10 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
             if (cocktail.strDrinkThumb != nil && cocktail.strDrinkThumb != "") {
                 CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
                     if let data = imageData {
-                        self.context.performBlock {
+//                        self.context.performBlock {
                             cocktail.drinkThumb = data
                             CoreDataStack.sharedInstance.saveContext()
-                        }
+//                        }
                         dispatch_async(dispatch_get_main_queue()) {
                             cell.photoView!.image = UIImage(data: data)
                             cell.activityIndicator.stopAnimating()

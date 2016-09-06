@@ -59,7 +59,7 @@ class CoreDataStack {
         
         self.dbURL = docUrl.URLByAppendingPathComponent("CocktailsModel.sqlite")
         
-        print(self.dbURL)
+//        print(self.dbURL)
         // Options for migration
         let options = [NSInferMappingModelAutomaticallyOption : true, NSMigratePersistentStoresAutomaticallyOption : true]
         
@@ -137,6 +137,29 @@ class CoreDataStack {
         } catch {}
         return fetchedCocktails
     }
+    
+    func getNoFavoriteCocktails() -> [Cocktail] {
+        var fetchedCocktails:[Cocktail] = []
+        let cocktailFetchRequest = NSFetchRequest(entityName: "Cocktail")
+        cocktailFetchRequest.predicate = NSPredicate(format: "isFavorite == %@", false)
+        cocktailFetchRequest.returnsObjectsAsFaults   = false
+        do {
+            fetchedCocktails = try CoreDataStack.sharedInstance.context.executeFetchRequest(cocktailFetchRequest) as! [Cocktail]
+        } catch {}
+        return fetchedCocktails
+    }
+    
+    func getFavoriteCocktails() -> [Cocktail] {
+        var fetchedCocktails:[Cocktail] = []
+        let cocktailFetchRequest = NSFetchRequest(entityName: "Cocktail")
+        cocktailFetchRequest.predicate = NSPredicate(format: "isFavorite == %@", true)
+        cocktailFetchRequest.returnsObjectsAsFaults   = false
+        do {
+            fetchedCocktails = try CoreDataStack.sharedInstance.context.executeFetchRequest(cocktailFetchRequest) as! [Cocktail]
+        } catch {}
+        
+        return fetchedCocktails
+    }
 }
 
 
@@ -144,10 +167,33 @@ class CoreDataStack {
 extension CoreDataStack  {
     
     func dropAllData() throws{
-        // delete all the objects in the db. This won't delete the files, it will
-        // just leave empty tables.
         try coordinator.destroyPersistentStoreAtURL(dbURL, withType:NSSQLiteStoreType , options: nil)
         try addStoreCoordinator(NSSQLiteStoreType, configuration: nil, storeURL: dbURL, options: nil)
+    }
+    
+    func dropNotFavorites() throws{
+        let fetchedCocktails = self.getNoFavoriteCocktails()
+        for fetchedCocktail in fetchedCocktails {
+            self.context.deleteObject(fetchedCocktail)
+            
+            do {
+                try self.context.save()
+            } catch {}
+        }
+    }
+    
+    func dropNotFavoritesExceptCurrent(idCocktail: NSNumber) throws{
+        let fetchedCocktails = self.getNoFavoriteCocktails()
+        for fetchedCocktail in fetchedCocktails {
+            
+            if fetchedCocktail.idDrink != idCocktail {
+                self.context.deleteObject(fetchedCocktail)
+            
+                do {
+                    try self.context.save()
+                } catch {}
+            }
+        }
     }
     
     func deleteCocktails(idCocktail: NSNumber) {
@@ -190,11 +236,12 @@ extension CoreDataStack {
         }
     }
     
-    func saveCocktail(cocktail: Cocktail) {
-        if !self.cocktailAlreadySaved(cocktail.idDrink!) {
-            let cocktail = Cocktail(cocktail: cocktail, context: self.context)
-            saveContext()
-            print(cocktail)
-        }
+    func saveCocktailAsFavorite(cocktail: Cocktail) {
+//        if !self.cocktailAlreadySaved(cocktail.idDrink!) {
+//            let cocktail = Cocktail(cocktail: cocktail, context: self.context)
+//            saveContext()
+//        }
+        cocktail.isFavorite = true
+        saveContext()
     }
 }
