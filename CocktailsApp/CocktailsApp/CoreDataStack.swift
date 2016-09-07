@@ -170,27 +170,20 @@ extension CoreDataStack  {
         try addStoreCoordinator(NSSQLiteStoreType, configuration: nil, storeURL: dbURL, options: nil)
     }
     
-    func dropNotFavorites() throws{
+    func dropNotFavorites() {
         let fetchedCocktails = self.getNoFavoriteCocktails()
         for fetchedCocktail in fetchedCocktails {
             self.context.deleteObject(fetchedCocktail)
-            
-            do {
-                try self.context.save()
-            } catch {}
+            self.saveContext()
         }
     }
     
-    func dropNotFavoritesExceptCurrent(idCocktail: NSNumber) throws{
+    func dropNotFavoritesExceptCurrent(idCocktail: NSNumber) {
         let fetchedCocktails = self.getNoFavoriteCocktails()
         for fetchedCocktail in fetchedCocktails {
-            
             if fetchedCocktail.idDrink != idCocktail {
                 self.context.deleteObject(fetchedCocktail)
-            
-                do {
-                    try self.context.save()
-                } catch {}
+                self.saveContext()
             }
         }
     }
