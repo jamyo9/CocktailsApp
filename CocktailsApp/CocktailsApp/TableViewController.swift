@@ -84,39 +84,30 @@ class TableViewController: UITableViewController {
         
         cell.activityIndicator.startAnimating()
         
-        if (cocktail.drinkThumb == nil ) {
-            if (cocktail.strDrinkThumb != nil) {
-                CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
-                    if let data = imageData {
-                        self.context.performBlock {
-                            cocktail.drinkThumb = data
-                            CoreDataStack.sharedInstance.saveContext()
-                        }
-                        dispatch_async(dispatch_get_main_queue()) {
-                            cell.cocktailImage!.image = UIImage(data: data)
-                            cell.activityIndicator.stopAnimating()
-                        }
-                    } else {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            cell.activityIndicator.stopAnimating()
-                            cell.cocktailImage.image = UIImage(named: "no-image")
-                        }
+        let strDrinkThumb = cocktail["strDrinkThumb"] as? String
+        let strDrink = cocktail["strDrink"] as? String
+        
+        if (strDrinkThumb != nil) {
+            CocktailsAPI.sharedInstance().taskForImageDownload(strDrinkThumb!) { imageData, error in
+                if let data = imageData {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        cell.cocktailImage!.image = UIImage(data: data)
+                        cell.activityIndicator.stopAnimating()
                     }
-                }
-            } else {
-                dispatch_async(dispatch_get_main_queue()) {
-                    cell.activityIndicator.stopAnimating()
-                    cell.cocktailImage.image = UIImage(named: "no-image")
+                } else {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        cell.activityIndicator.stopAnimating()
+                        cell.cocktailImage.image = UIImage(named: "no-image")
+                    }
                 }
             }
         } else {
             dispatch_async(dispatch_get_main_queue()) {
-                cell.cocktailImage!.image = UIImage(data: cocktail.drinkThumb!)
                 cell.activityIndicator.stopAnimating()
+                cell.cocktailImage.image = UIImage(named: "no-image")
             }
         }
-        
-        cell.textLable.text = cocktail.strDrink
+        cell.textLable.text = strDrink
         return cell
     }
     
@@ -133,7 +124,7 @@ class TableViewController: UITableViewController {
             if let indexPath = tableView.indexPathForSelectedRow {
                 let cocktail = cocktailsInstance.cocktails[indexPath.item]
                 let controller = segue.destinationViewController as! CocktailDetailViewController
-                controller.cocktail = cocktail
+                controller.cocktailDictionary = cocktail
             }
         }
     }
@@ -154,7 +145,8 @@ extension TableViewController {
         /* Configure the alert view to display the error */
         let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .Alert)
         let cancelAction = UIAlertAction(title: actionTitle, style: .Cancel) { (action) in
-            self.searchBarCancelButtonClicked(self.searchController.searchBar)
+            self.cocktailsInstance.cocktails = []
+            self.reloadTable()
         }
         alert.addAction(cancelAction)
         
@@ -163,15 +155,39 @@ extension TableViewController {
     }
     
     func filterContentForCategory(category: String = "All") {
-        cocktailsInstance.cocktails = cocktailsInstance.cocktails.filter({( cocktail : Cocktail) -> Bool in
-            return (category == "All") || (cocktail.strCategory == category)
+        var strCategory = ""
+        cocktailsInstance.cocktails = cocktailsInstance.cocktails.filter({( cocktail : [String: AnyObject]) -> Bool in
+            if cocktail["strCategory"] == nil {
+                let idDrink = NSNumber(int:Int32(cocktail["idDrink"] as! String)!)
+                CocktailsAPI.sharedInstance().getCocktailById(idDrink) {success, arrayOfCocktailDictionary, errorString in
+                    if errorString == nil {
+                        strCategory = (arrayOfCocktailDictionary![0] as? [String: AnyObject])!["strCategory"] as! String
+                    }
+                }
+            } else {
+                strCategory = cocktail["strCategory"] as! String
+            }
+            return (category == "All") || (strCategory == category)
         })
         tableView.reloadData()
     }
     
     func filterContentForName(searchText: String) {
-        cocktailsInstance.cocktails = cocktailsInstance.cocktails.filter({( cocktail : Cocktail) -> Bool in
-            return cocktail.strDrink!.lowercaseString.containsString(searchText.lowercaseString)
+        var strDrink = ""
+        cocktailsInstance.cocktails = cocktailsInstance.cocktails.filter({( cocktail : [String: AnyObject]) -> Bool in
+            
+            if cocktail["strDrink"] == nil {
+                let idDrink = NSNumber(int:Int32(cocktail["idDrink"] as! String)!)
+                CocktailsAPI.sharedInstance().getCocktailById(idDrink) {success, arrayOfCocktailDictionary, errorString in
+                    if errorString == nil {
+                        strDrink = (arrayOfCocktailDictionary![0] as? [String: AnyObject])!["strDrink"] as! String
+                    }
+                }
+            } else {
+                strDrink = cocktail["strDrink"] as! String
+            }
+            
+            return strDrink.lowercaseString.containsString(searchText.lowercaseString)
         })
         tableView.reloadData()
     }
@@ -197,8 +213,6 @@ extension TableViewController: UISearchBarDelegate {
                     }
                 }
             }
-            
-            filterContentForCategory(category)
         } else {
             if category == "Punch" {
                 category = "Punch / Party Drink"
@@ -219,15 +233,14 @@ extension TableViewController: UISearchBarDelegate {
                     }
                 }
             }
-            
-            filterContentForName(searchController.searchBar.text!)
         }
+        self.filterContentForName(self.searchController.searchBar.text!)
         NSUserDefaults.standardUserDefaults().setInteger(selectedScope, forKey: "Category")
     }
     
     func searchBarCancelButtonClicked(searchBar: UISearchBar) {
-        searchController.searchBar.selectedScopeButtonIndex = 0
-        searchController.searchBar.text = ""
+        searchBar.selectedScopeButtonIndex = 0
+        searchBar.text = ""
         
         NSUserDefaults.standardUserDefaults().setObject("", forKey: "SearchText")
         NSUserDefaults.standardUserDefaults().setInteger(0, forKey: "Category")
@@ -254,7 +267,7 @@ extension TableViewController: UISearchResultsUpdating {
         
         let searchBar = searchController.searchBar
         let category = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
-        filterContentForCategory(category)
+        self.filterContentForCategory(category)
         NSUserDefaults.standardUserDefaults().setObject(searchController.searchBar.text!, forKey: "SearchText")
     }
 }

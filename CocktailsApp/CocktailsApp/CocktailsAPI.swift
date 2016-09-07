@@ -86,20 +86,20 @@ class CocktailsAPI {
         }
     }
     
-    func getCocktailById(idDrink: NSNumber, completionHandler: (success: Bool, arrayOfCocktailDictionaies: [AnyObject]?, errorString: String?) -> Void) {
+    func getCocktailById(idDrink: NSNumber, completionHandler: (success: Bool, arrayOfCocktailDictionary: [AnyObject]?, errorString: String?) -> Void) {
         
         let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.lookupMethod + "?" + CocktailsAPI.Constants.lookupOption + "=" + String(idDrink)
         
         taskForGETMethod(baseURL) { JSONResult, error in
             if let error = error {
                 // Set error string to localizedDescription in error
-                completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: error.localizedDescription)
+                completionHandler(success: false, arrayOfCocktailDictionary: nil, errorString: error.localizedDescription)
             } else {
                 // parse the json response which looks like the following:
                 if let arrayOfCocktailDicts = JSONResult.valueForKey("drinks") as? [AnyObject] {
-                    completionHandler(success: true, arrayOfCocktailDictionaies: arrayOfCocktailDicts, errorString: nil)
+                    completionHandler(success: true, arrayOfCocktailDictionary: arrayOfCocktailDicts, errorString: nil)
                 } else {
-                    completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: "No results from server.")
+                    completionHandler(success: false, arrayOfCocktailDictionary: nil, errorString: "No results from server.")
                 }
             }
         }

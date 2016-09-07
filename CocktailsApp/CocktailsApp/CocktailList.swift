@@ -9,7 +9,10 @@
 import CoreData
 
 class CocktailList {
-    var cocktails: [Cocktail] = []
+//    var cocktails: [Cocktail] = []
+//    var favoriteCocktails: [Cocktail] = []
+    
+    var cocktails: [[String: AnyObject]] = []
     var favoriteCocktails: [Cocktail] = []
     
     var context: NSManagedObjectContext {
@@ -39,31 +42,9 @@ class CocktailList {
         
         CocktailsAPI.sharedInstance().getCocktailsByName(cocktailName) { success, arrayOfCocktailDictionaies, errorString in
             if errorString == nil {
-                if let array = arrayOfCocktailDictionaies as? [[String: AnyObject]] {
-                    
-                    self.reset()
-                    
-                    // Update collection of position with the new data from Parse.
-                    for cocktailDictionary in array {
-                        let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
-                        if self.findFavoriteById(idDrink) {
-                            self.cocktails.append(self.getCocktailFavoriteById(idDrink)!)
-                        } else {
-                            self.cocktails.append(self.parseCocktail(cocktailDictionary, isFavorite: false))
-                        }
-                    }
-                    
-                    self.sortList()
-                    
-                    // Send a notification indicating new position data has been obtained from Parse.
-                    NSNotificationCenter.defaultCenter().postNotificationName("cocktailUpdateNotificationKey", object: self)
-                    
-                    completion(result:true, errorString: nil)
-                } else {
-                    // Server responded with success, but a nil array. Do not update local positions.
-                    NSLog("new cocktail data returned a nil array")
-                    completion(result:true, errorString: nil)
-                }
+                self.reset()
+                self.cocktails = (arrayOfCocktailDictionaies as? [[String: AnyObject]])!
+                completion(result:true, errorString: nil)
             } else {
                 NSLog("error getCocktailsByName()")
                 completion(result:false, errorString: errorString)
@@ -75,31 +56,9 @@ class CocktailList {
         
         CocktailsAPI.sharedInstance().getCocktailsByCategory(cocktailCategory) { success, arrayOfCocktailDictionaies, errorString in
             if errorString == nil {
-                if let array = arrayOfCocktailDictionaies as? [[String: AnyObject]] {
-                    
-                    self.reset()
-                    
-                    // Update collection of position with the new data from Parse.
-                    for cocktailDictionary in array {
-                        let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
-                        if self.findFavoriteById(idDrink) {
-                            self.cocktails.append(self.getCocktailFavoriteById(idDrink)!)
-                        } else {
-                            self.cocktails.append(Cocktail(idDrink: idDrink, strDrink: (cocktailDictionary["strDrink"] as? String)!, strDrinkThumb: cocktailDictionary["strDrinkThumb"]!, context: self.context))
-                        }
-                    }
-                    
-                    self.sortList()
-                    
-                    // Send a notification indicating new position data has been obtained from Parse.
-                    NSNotificationCenter.defaultCenter().postNotificationName("cocktailUpdateNotificationKey", object: self)
-                    
-                    completion(result:true, errorString: nil)
-                } else {
-                    // Server responded with success, but a nil array. Do not update local positions.
-                    NSLog("new cocktail data returned a nil array")
-                    completion(result:true, errorString: nil)
-                }
+                self.reset()
+                self.cocktails = (arrayOfCocktailDictionaies as? [[String: AnyObject]])!
+                completion(result:true, errorString: nil)
             } else {
                 NSLog("error getCocktailsByCategory()")
                 completion(result:false, errorString: errorString)
@@ -108,18 +67,22 @@ class CocktailList {
     }
     
     /* sort list by date */
-    func sortList() {
-        self.cocktails.sortInPlace {
-            $0.strDrink!.compare($1.strDrink!) == NSComparisonResult.OrderedAscending
-        }
-    }
+//    func sortList() {
+//        self.cocktails.sortInPlace {
+//            $0.strDrink!.compare($1.strDrink!) == NSComparisonResult.OrderedAscending
+//        }
+//        
+////        let strDrink1 = $0["strDrink"] as! String
+////        let strDrink2 = $1["strDrink"] as! String
+////        strDrink1.compare(strDrink2) == NSComparisonResult.OrderedAscending
+//    }
     
     /* debug helper function */
-    func printList() {
-        for cocktail in cocktails {
-            print("\(cocktail.idDrink)")
-        }
-    }
+//    func printList() {
+//        for cocktail in cocktails {
+//            print("\(cocktail.idDrink)")
+//        }
+//    }
     
     func parseCocktail(cocktailDictionary: [String: AnyObject]) -> Cocktail {
         let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
