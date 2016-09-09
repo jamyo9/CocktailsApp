@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import MapKit
 
-class FavoriteCocktailsCollectionViewController: UIViewController, NSFetchedResultsControllerDelegate {
+class FavoriteCocktailsCollectionViewController: UIViewController {//, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var collectionView: UICollectionView!
     
@@ -18,14 +18,14 @@ class FavoriteCocktailsCollectionViewController: UIViewController, NSFetchedResu
         return CoreDataStack.sharedInstance.context
     }
     
+    var favoriteCocktails: [Cocktail] = []
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.collectionView.reloadData()
+        self.favoriteCocktails = CoreDataStack.sharedInstance.getFavoriteCocktails()
         
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {}
+        self.collectionView.reloadData()
     }
     
     override func viewDidLoad() {
@@ -35,34 +35,40 @@ class FavoriteCocktailsCollectionViewController: UIViewController, NSFetchedResu
         collectionView.dataSource = self
         collectionView.allowsMultipleSelection = false
         
-        fetchedResultsController.delegate = self
+//        fetchedResultsController.delegate = self
+//        
+//        do {
+//            try fetchedResultsController.performFetch()
+//        } catch {}
     }
     
-    // MARK: - NSFetchedResultsController
-    lazy var fetchedResultsController: NSFetchedResultsController = {
-        
-        let fetchRequest = NSFetchRequest(entityName: "Cocktail")
-        fetchRequest.sortDescriptors = []
-        fetchRequest.predicate = NSPredicate(format: "isFavorite == %@", true)
-        fetchRequest.returnsObjectsAsFaults   = false
-        
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.context, sectionNameKeyPath: nil, cacheName: nil)
-        
-        fetchedResultsController.delegate = self
-        
-        return fetchedResultsController
-    }()
+//    // MARK: - NSFetchedResultsController
+//    lazy var fetchedResultsController: NSFetchedResultsController = {
+//        
+//        let fetchRequest = NSFetchRequest(entityName: "Cocktail")
+//        fetchRequest.sortDescriptors = []
+//        fetchRequest.predicate = NSPredicate(format: "isFavorite == %@", NSNumber(bool: true))
+//        fetchRequest.returnsObjectsAsFaults   = false
+//        
+//        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.context, sectionNameKeyPath: nil, cacheName: nil)
+//        
+//        fetchedResultsController.delegate = self
+//        
+//        return fetchedResultsController
+//    }()
 }
 
 extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let sectionInfo = self.fetchedResultsController.sections![section]
-        return sectionInfo.numberOfObjects
+//        let sectionInfo = self.fetchedResultsController.sections![section]
+//        return sectionInfo.numberOfObjects
+        return self.favoriteCocktails.count
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cocktail = fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail
+//        let cocktail = fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail
+        let cocktail = favoriteCocktails[indexPath.row]
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CocktailCellID", forIndexPath: indexPath) as! CocktailCollectionCell
         
         if (cocktail.drinkThumb == nil ) {
@@ -72,10 +78,8 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
             if (cocktail.strDrinkThumb != nil && cocktail.strDrinkThumb != "") {
                 CocktailsAPI.sharedInstance().taskForImageDownload(cocktail.strDrinkThumb!) { imageData, error in
                     if let data = imageData {
-//                        self.context.performBlock {
-                            cocktail.drinkThumb = data
-                            CoreDataStack.sharedInstance.saveContext()
-//                        }
+                        cocktail.drinkThumb = data
+                        CoreDataStack.sharedInstance.saveContext()
                         dispatch_async(dispatch_get_main_queue()) {
                             cell.photoView!.image = UIImage(data: data)
                             cell.activityIndicator.stopAnimating()
@@ -83,7 +87,8 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
                     } else {
                         dispatch_async(dispatch_get_main_queue()) {
                             cell.activityIndicator.stopAnimating()
-                            cell.photoView.image = UIImage(named: "no-image")                        }
+                            cell.photoView.image = UIImage(named: "no-image")
+                        }
                     }
                 }
             } else {
@@ -106,7 +111,8 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
         if segue.identifier == "CocktailDetailFromFavoritesSegue" {
             let detailsVC: CocktailDetailViewController = segue.destinationViewController as! CocktailDetailViewController
             let indexPath = self.collectionView.indexPathsForSelectedItems()![0]
-            let cocktail = (fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail)
+//            let cocktail = (fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail)
+            let cocktail = self.favoriteCocktails[indexPath.row]
             detailsVC.cocktail = cocktail
         }
     }

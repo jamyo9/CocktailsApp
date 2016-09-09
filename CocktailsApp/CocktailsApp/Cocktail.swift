@@ -26,16 +26,6 @@ class Cocktail: NSManagedObject {
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
-        
-        self.idDrink = 0
-        self.strDrinkThumb = ""
-        self.drinkThumb = nil
-        self.strDrink = ""
-        self.strCategory = ""
-        self.strAlcoholic = ""
-        self.strGlass = ""
-        self.strInstructions = ""
-        self.isFavorite = false
     }
     
     convenience init(cocktail: Cocktail, context: NSManagedObjectContext) {

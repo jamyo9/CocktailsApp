@@ -9,11 +9,8 @@
 import CoreData
 
 class CocktailList {
-//    var cocktails: [Cocktail] = []
-//    var favoriteCocktails: [Cocktail] = []
     
     var cocktails: [[String: AnyObject]] = []
-    var favoriteCocktails: [Cocktail] = []
     
     var context: NSManagedObjectContext {
         return CoreDataStack.sharedInstance.context
@@ -31,11 +28,6 @@ class CocktailList {
     
     func reset() {
         cocktails.removeAll(keepCapacity: false)
-        favoriteCocktails.removeAll(keepCapacity: false)
-        
-        for cocktail in CoreDataStack.sharedInstance.getFavoriteCocktails() {
-            favoriteCocktails.append(cocktail)
-        }
     }
     
     func getCocktailsByName(cocktailName: String, completion: (result: Bool, errorString: String?) -> Void) {
@@ -66,29 +58,6 @@ class CocktailList {
         }
     }
     
-    /* sort list by date */
-//    func sortList() {
-//        self.cocktails.sortInPlace {
-//            $0.strDrink!.compare($1.strDrink!) == NSComparisonResult.OrderedAscending
-//        }
-//        
-////        let strDrink1 = $0["strDrink"] as! String
-////        let strDrink2 = $1["strDrink"] as! String
-////        strDrink1.compare(strDrink2) == NSComparisonResult.OrderedAscending
-//    }
-    
-    /* debug helper function */
-//    func printList() {
-//        for cocktail in cocktails {
-//            print("\(cocktail.idDrink)")
-//        }
-//    }
-    
-    func parseCocktail(cocktailDictionary: [String: AnyObject]) -> Cocktail {
-        let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
-        return self.parseCocktail(cocktailDictionary, isFavorite: self.findFavoriteById(idDrink))
-    }
-    
     func parseCocktail(cocktailDictionary: [String: AnyObject], isFavorite: Bool) -> Cocktail {
         var ingredients = Set<Ingredient>()
         var measures = Set<Measure>()
@@ -111,24 +80,9 @@ class CocktailList {
         let cocktail = Cocktail(dictionary: cocktailDictionary, isFavorite: isFavorite, context: self.context)
         cocktail.ingredients = ingredients
         cocktail.measures = measures
+        
+        CoreDataStack.sharedInstance.saveContext()
+        
         return cocktail
-    }
-    
-    func findFavoriteById(idDrink: NSNumber) -> Bool {
-        for cocktail in self.favoriteCocktails {
-            if cocktail.idDrink == idDrink {
-                return true
-            }
-        }
-        return false
-    }
-    
-    func getCocktailFavoriteById(idDrink: NSNumber) -> Cocktail? {
-        for cocktail in self.favoriteCocktails {
-            if cocktail.idDrink == idDrink {
-                return cocktail
-            }
-        }
-        return nil
     }
 }

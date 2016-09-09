@@ -16,8 +16,6 @@ class CocktailDetailViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var detailDescriptionLabel: UITextView!
     
-//    var cocktailSaved: Bool!
-    
     var context: NSManagedObjectContext {
         return CoreDataStack.sharedInstance.context
     }
@@ -30,50 +28,32 @@ class CocktailDetailViewController: UIViewController {
         
         if self.cocktail == nil {
             let idDrink = NSNumber(int:Int32(cocktailDictionary!["idDrink"] as! String)!)
-            let cocktails = CoreDataStack.sharedInstance.getCocktailsById(idDrink)
-            if cocktails.count != 0 {
-                self.cocktail = cocktails[0]
-                
-                if !(self.cocktail!.isCompleted()) {
+            self.activityIndicator.startAnimating()
                     
-                    self.activityIndicator.startAnimating()
-                    
-                    CocktailsAPI.sharedInstance().getCocktailById((self.cocktail!.idDrink)!) { success, arrayOfCocktailDictionaies, errorString in
-                        if errorString == nil {
-                            if let cocktailDictionary = arrayOfCocktailDictionaies![0] as? [String: AnyObject] {
-                                self.cocktail = CocktailList.sharedInstance().parseCocktail(cocktailDictionary)
-                                
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    self.configureView()
-                                }
-                            } else {
-                                // Server responded with success, but a nil array. Do not update local positions.
-                                self.showError("", errorMessage: "Cocktail data returned a nil")
-                            }
-                        } else {
-                            self.showError("", errorMessage: "Error Getting Cocktail")
+            CocktailsAPI.sharedInstance().getCocktailById(idDrink) { success, arrayOfCocktailDictionary, errorString in
+                if errorString == nil {
+                    if let cocktailDictionary = arrayOfCocktailDictionary![0] as? [String: AnyObject] {
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.configureView(cocktailDictionary)
                         }
+                    } else {
+                        // Server responded with success, but a nil array. Do not update local positions.
+                        self.showError("", errorMessage: "Cocktail data returned a nil")
                     }
                 } else {
-                    dispatch_async(dispatch_get_main_queue()) {
-                        self.configureView()
-                    }
+                    self.showError("", errorMessage: "Error Getting Cocktail")
                 }
-            } else {
-                self.configureView(cocktailDictionary!)
             }
         } else {
             if !(self.cocktail!.isCompleted()) {
                 
                 self.activityIndicator.startAnimating()
                 
-                CocktailsAPI.sharedInstance().getCocktailById((self.cocktail!.idDrink)!) { success, arrayOfCocktailDictionaies, errorString in
+                CocktailsAPI.sharedInstance().getCocktailById((self.cocktail!.idDrink)!) { success, arrayOfCocktailDictionary, errorString in
                     if errorString == nil {
-                        if let cocktailDictionary = arrayOfCocktailDictionaies![0] as? [String: AnyObject] {
-                            self.cocktail = CocktailList.sharedInstance().parseCocktail(cocktailDictionary)
-                            
+                        if let cocktailDictionary = arrayOfCocktailDictionary![0] as? [String: AnyObject] {                            
                             dispatch_async(dispatch_get_main_queue()) {
-                                self.configureView()
+                                self.configureView(cocktailDictionary)
                             }
                         } else {
                             // Server responded with success, but a nil array. Do not update local positions.
@@ -92,13 +72,11 @@ class CocktailDetailViewController: UIViewController {
     }
     
     func favoriteAction(sender: AnyObject) {
-        if self.cocktail?.isFavorite == false {
-            CoreDataStack.sharedInstance.saveCocktailAsFavorite(self.cocktail!)
-        } else if self.cocktail == nil {
-            self.cocktail = CocktailList.sharedInstance().parseCocktail(self.cocktailDictionary!)
-            CoreDataStack.sharedInstance.saveCocktailAsFavorite(self.cocktail!)
+        if self.cocktail == nil {
+            self.cocktail = CocktailList.sharedInstance().parseCocktail(self.cocktailDictionary!, isFavorite: true)
         } else {
-            CoreDataStack.sharedInstance.deleteCocktails((self.cocktail?.idDrink)!)
+            self.context.deleteObject(self.cocktail!)
+            CoreDataStack.sharedInstance.saveContext()
         }
         
         configFavoriteCocktailButton()
@@ -118,7 +96,6 @@ extension CocktailDetailViewController {
                         CocktailsAPI.sharedInstance().taskForImageDownload(detailCocktail.strDrinkThumb!) { imageData, error in
                             if let data = imageData {
                                     detailCocktail.drinkThumb = data
-                                    CoreDataStack.sharedInstance.saveContext()
                                 dispatch_async(dispatch_get_main_queue()) {
                                     cocktailImageView.image = UIImage(data: data)
                                     activityIndicator.stopAnimating()
@@ -182,6 +159,11 @@ extension CocktailDetailViewController {
             detailDescriptionLabel.text = createDescription(cocktailDictionary)
         }
         
+        let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
+        let cocktails = CoreDataStack.sharedInstance.getCocktailsById(idDrink)
+        if cocktails.count > 0 {
+            self.cocktail = cocktails[0]
+        }
         self.configFavoriteCocktailButton()
     }
     
