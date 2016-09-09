@@ -76,6 +76,12 @@ class TableViewController: UITableViewController {
                 self.searchController.searchBar.becomeFirstResponder()
             }
         }
+        
+        self.searchController.loadViewIfNeeded()
+    }
+    
+    deinit {
+        self.searchController.loadViewIfNeeded()
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -198,8 +204,9 @@ extension TableViewController: UISearchBarDelegate {
     func searchBar(searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         let searchBar = searchController.searchBar
         var category = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
+        
         if category == "All" {
-            cocktailsInstance.getCocktailsByName(searchController.searchBar.text!) { success, errorString in
+            cocktailsInstance.getCocktailsByName(searchBar.text!) { success, errorString in
                 if success == false {
                     //if let errorString = errorString {
                     if errorString != nil {
@@ -214,6 +221,8 @@ extension TableViewController: UISearchBarDelegate {
                 }
             }
         } else {
+            searchBar.text = ""
+            
             if category == "Punch" {
                 category = "Punch / Party Drink"
             } else if category == "Shake" {
@@ -250,7 +259,10 @@ extension TableViewController: UISearchBarDelegate {
 extension TableViewController: UISearchResultsUpdating {
     // MARK: - UISearchResultsUpdating Delegate
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        cocktailsInstance.getCocktailsByName(searchController.searchBar.text!) { success, errorString in
+        let searchBar = searchController.searchBar
+        let category = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
+        
+        cocktailsInstance.getCocktailsByName(searchBar.text!) { success, errorString in
             if success == false {
                 //if let errorString = errorString {
                 if errorString != nil {
@@ -264,10 +276,8 @@ extension TableViewController: UISearchResultsUpdating {
                 }
             }
         }
-        
-        let searchBar = searchController.searchBar
-        let category = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
         self.filterContentForCategory(category)
+        
         NSUserDefaults.standardUserDefaults().setObject(searchController.searchBar.text!, forKey: "SearchText")
     }
 }
