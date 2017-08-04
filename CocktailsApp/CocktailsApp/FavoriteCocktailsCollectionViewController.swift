@@ -20,7 +20,7 @@ class FavoriteCocktailsCollectionViewController: UIViewController {//, NSFetched
     
     var favoriteCocktails: [Cocktail] = []
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         self.favoriteCocktails = CoreDataStack.sharedInstance.getFavoriteCocktails()
@@ -60,16 +60,16 @@ class FavoriteCocktailsCollectionViewController: UIViewController {//, NSFetched
 
 extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 //        let sectionInfo = self.fetchedResultsController.sections![section]
 //        return sectionInfo.numberOfObjects
         return self.favoriteCocktails.count
     }
     
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 //        let cocktail = fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail
-        let cocktail = favoriteCocktails[indexPath.row]
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CocktailCellID", forIndexPath: indexPath) as! CocktailCollectionCell
+        let cocktail = favoriteCocktails[(indexPath as NSIndexPath).row]
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CocktailCellID", for: indexPath) as! CocktailCollectionCell
         
         if (cocktail.drinkThumb == nil ) {
             
@@ -80,26 +80,26 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
                     if let data = imageData {
                         cocktail.drinkThumb = data
                         CoreDataStack.sharedInstance.saveContext()
-                        dispatch_async(dispatch_get_main_queue()) {
+                        DispatchQueue.main.async {
                             cell.photoView!.image = UIImage(data: data)
                             cell.activityIndicator.stopAnimating()
                         }
                     } else {
-                        dispatch_async(dispatch_get_main_queue()) {
+                        DispatchQueue.main.async {
                             cell.activityIndicator.stopAnimating()
                             cell.photoView.image = UIImage(named: "no-image")
                         }
                     }
                 }
             } else {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     cell.activityIndicator.stopAnimating()
                     cell.photoView.image = UIImage(named: "no-image")
                 }
             }
         } else {
-            cell.photoView!.image = UIImage(data: cocktail.drinkThumb!)
-            dispatch_async(dispatch_get_main_queue()) {
+            cell.photoView!.image = UIImage(data: cocktail.drinkThumb! as Data)
+            DispatchQueue.main.async {
                 cell.activityIndicator.stopAnimating()
             }
         }
@@ -107,12 +107,12 @@ extension FavoriteCocktailsCollectionViewController: UICollectionViewDelegate, U
         return cell
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "CocktailDetailFromFavoritesSegue" {
-            let detailsVC: CocktailDetailViewController = segue.destinationViewController as! CocktailDetailViewController
-            let indexPath = self.collectionView.indexPathsForSelectedItems()![0]
+            let detailsVC: CocktailDetailViewController = segue.destination as! CocktailDetailViewController
+            let indexPath = self.collectionView.indexPathsForSelectedItems![0]
 //            let cocktail = (fetchedResultsController.objectAtIndexPath(indexPath) as! Cocktail)
-            let cocktail = self.favoriteCocktails[indexPath.row]
+            let cocktail = self.favoriteCocktails[(indexPath as NSIndexPath).row]
             detailsVC.cocktail = cocktail
         }
     }

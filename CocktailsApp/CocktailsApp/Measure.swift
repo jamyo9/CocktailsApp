@@ -12,14 +12,14 @@ import CoreData
 
 class Measure: NSManagedObject {
 
-    override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
-        super.init(entity: entity, insertIntoManagedObjectContext: context)
+    override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
+        super.init(entity: entity, insertInto: context)
     }
     
     convenience init(strMeasure: String, context: NSManagedObjectContext) {
         
-        let entity = NSEntityDescription.entityForName("Measure", inManagedObjectContext: context)!
-        self.init(entity: entity, insertIntoManagedObjectContext: context)
+        let entity = NSEntityDescription.entity(forEntityName: "Measure", in: context)!
+        self.init(entity: entity, insertInto: context)
         
         self.strMeasure = strMeasure as String
     }
@@ -27,8 +27,8 @@ class Measure: NSManagedObject {
     
     convenience init(measure: Measure, context: NSManagedObjectContext) {
         
-        let entity = NSEntityDescription.entityForName("Measure", inManagedObjectContext: context)!
-        self.init(entity: entity, insertIntoManagedObjectContext: context)
+        let entity = NSEntityDescription.entity(forEntityName: "Measure", in: context)!
+        self.init(entity: entity, insertInto: context)
         
         self.strMeasure = measure.strMeasure
     }

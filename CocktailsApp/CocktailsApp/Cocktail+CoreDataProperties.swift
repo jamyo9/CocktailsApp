@@ -14,7 +14,7 @@ import CoreData
 
 extension Cocktail {
 
-    @NSManaged var drinkThumb: NSData?
+    @NSManaged var drinkThumb: Data?
     @NSManaged var idDrink: NSNumber?
     @NSManaged var strAlcoholic: String?
     @NSManaged var strCategory: String?

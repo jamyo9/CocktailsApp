@@ -24,13 +24,13 @@ class Cocktail: NSManagedObject {
         static let Measure = "strMeasure"
     }
 
-    override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
-        super.init(entity: entity, insertIntoManagedObjectContext: context)
+    override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
+        super.init(entity: entity, insertInto: context)
     }
     
     convenience init(cocktail: Cocktail, context: NSManagedObjectContext) {
-        let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
-        self.init(entity: entity, insertIntoManagedObjectContext: context)
+        let entity = NSEntityDescription.entity(forEntityName: "Cocktail", in: context)!
+        self.init(entity: entity, insertInto: context)
         self.idDrink = cocktail.idDrink
         self.strDrinkThumb = cocktail.strDrinkThumb
         self.strDrink = cocktail.strDrink
@@ -55,8 +55,8 @@ class Cocktail: NSManagedObject {
     }
     
     convenience init(idDrink: NSNumber, strDrink: String, strDrinkThumb: AnyObject, context: NSManagedObjectContext) {
-        let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
-        self.init(entity: entity, insertIntoManagedObjectContext: context)
+        let entity = NSEntityDescription.entity(forEntityName: "Cocktail", in: context)!
+        self.init(entity: entity, insertInto: context)
         
         self.idDrink = idDrink
         self.strDrink = strDrink
@@ -75,10 +75,10 @@ class Cocktail: NSManagedObject {
     }
     
     convenience init(dictionary: [String:AnyObject], isFavorite: Bool, context: NSManagedObjectContext) {
-        let entity = NSEntityDescription.entityForName("Cocktail", inManagedObjectContext: context)!
-        self.init(entity: entity, insertIntoManagedObjectContext: context)
+        let entity = NSEntityDescription.entity(forEntityName: "Cocktail", in: context)!
+        self.init(entity: entity, insertInto: context)
         
-        self.idDrink = NSNumber(int:Int32(dictionary[Keys.ID] as! String)!)
+        self.idDrink = NSNumber(value: Int32(dictionary[Keys.ID] as! String)! as Int32)
         self.strDrinkThumb = dictionary[Keys.DrinkThumb] as? String
         self.strDrink = dictionary[Keys.Drink] as? String
         self.strCategory = dictionary[Keys.Category] as? String
@@ -86,7 +86,7 @@ class Cocktail: NSManagedObject {
         self.strGlass = dictionary[Keys.Glass] as? String
         self.strInstructions = dictionary[Keys.Instructions] as? String
         
-        self.isFavorite = isFavorite
+        self.isFavorite = isFavorite as NSNumber?
     }
     
     func hasIngredients() -> Bool {

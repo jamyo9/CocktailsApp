@@ -21,31 +21,31 @@ class TableViewController: UITableViewController {
         return CoreDataStack.sharedInstance.context
     }
     
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
-    var activityIndicator : UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRectMake(0, 0, 50, 50)) as UIActivityIndicatorView
+    var activityIndicator : UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50)) as UIActivityIndicatorView
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        tableView.hidden = false
-        tabBarController?.tabBar.hidden = false
+        tableView.isHidden = false
+        tabBarController?.tabBar.isHidden = false
         
         cocktailsInstance.getCocktailsByName(searchController.searchBar.text!) { success, errorString in
             if success == false {
                 //if let errorString = errorString {
                 if errorString != nil {
-                    dispatch_async(dispatch_get_main_queue(),{
+                    DispatchQueue.main.async(execute: {
                         self.showError("", errorMessage: errorString!)
                     })
                 }
             } else {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     self.reloadTable()
                 }
             }
         }
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TableViewController.reloadTable), name: "", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(TableViewController.reloadTable), name: NSNotification.Name(rawValue: ""), object: nil)
     }
     
     override func viewDidLoad() {
@@ -66,12 +66,12 @@ class TableViewController: UITableViewController {
         searchController.searchBar.scopeButtonTitles = ["All", "Cocktail", "Shot", "Punch", "Beer", "Shake"]
         tableView.tableHeaderView = searchController.searchBar
         
-        let category = NSUserDefaults.standardUserDefaults().integerForKey("Category")
-        let searchText = NSUserDefaults.standardUserDefaults().stringForKey("SearchText")
+        let category = UserDefaults.standard.integer(forKey: "Category")
+        let searchText = UserDefaults.standard.string(forKey: "SearchText")
         searchController.searchBar.selectedScopeButtonIndex = category
         searchController.searchBar.text = searchText
         
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             if category != 0 || searchText != "" {
                 self.searchController.searchBar.becomeFirstResponder()
             }
@@ -84,9 +84,9 @@ class TableViewController: UITableViewController {
         self.searchController.loadViewIfNeeded()
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("CocktailTableViewCell", forIndexPath: indexPath) as! CocktailTableCell
-        let cocktail = cocktailsInstance.cocktails[indexPath.row]
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CocktailTableViewCell", for: indexPath) as! CocktailTableCell
+        let cocktail = cocktailsInstance.cocktails[(indexPath as NSIndexPath).row]
         
         cell.activityIndicator.startAnimating()
         
@@ -96,19 +96,19 @@ class TableViewController: UITableViewController {
         if (strDrinkThumb != nil) {
             CocktailsAPI.sharedInstance().taskForImageDownload(strDrinkThumb!) { imageData, error in
                 if let data = imageData {
-                    dispatch_async(dispatch_get_main_queue()) {
+                    DispatchQueue.main.async {
                         cell.cocktailImage!.image = UIImage(data: data)
                         cell.activityIndicator.stopAnimating()
                     }
                 } else {
-                    dispatch_async(dispatch_get_main_queue()) {
+                    DispatchQueue.main.async {
                         cell.activityIndicator.stopAnimating()
                         cell.cocktailImage.image = UIImage(named: "no-image")
                     }
                 }
             }
         } else {
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 cell.activityIndicator.stopAnimating()
                 cell.cocktailImage.image = UIImage(named: "no-image")
             }
@@ -117,7 +117,7 @@ class TableViewController: UITableViewController {
         return cell
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return cocktailsInstance.cocktails.count
     }
     
@@ -125,11 +125,11 @@ class TableViewController: UITableViewController {
         self.cocktailTableView.reloadData()
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "CocktailDetailFromListSegue" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                let cocktail = cocktailsInstance.cocktails[indexPath.item]
-                let controller = segue.destinationViewController as! CocktailDetailViewController
+                let cocktail = cocktailsInstance.cocktails[(indexPath as NSIndexPath).item]
+                let controller = segue.destination as! CocktailDetailViewController
                 controller.cocktailDictionary = cocktail
             }
         }
@@ -138,7 +138,7 @@ class TableViewController: UITableViewController {
 
 extension TableViewController {
     
-    func showError(errorCode: String, errorMessage: String?){
+    func showError(_ errorCode: String, errorMessage: String?){
         let titleString = "Error"
         var errorString = ""
         errorString = errorMessage!
@@ -146,25 +146,25 @@ extension TableViewController {
     }
     
     //Function that configures and shows an alert
-    func showAlert(alertTitle: String, alertMessage: String, actionTitle: String){
+    func showAlert(_ alertTitle: String, alertMessage: String, actionTitle: String){
         
         /* Configure the alert view to display the error */
-        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .Alert)
-        let cancelAction = UIAlertAction(title: actionTitle, style: .Cancel) { (action) in
+        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: actionTitle, style: .cancel) { (action) in
             self.cocktailsInstance.cocktails = []
             self.reloadTable()
         }
         alert.addAction(cancelAction)
         
         /* Present the alert view */
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
     
-    func filterContentForCategory(category: String = "All") {
+    func filterContentForCategory(_ category: String = "All") {
         var strCategory = ""
         cocktailsInstance.cocktails = cocktailsInstance.cocktails.filter({( cocktail : [String: AnyObject]) -> Bool in
             if cocktail["strCategory"] == nil {
-                let idDrink = NSNumber(int:Int32(cocktail["idDrink"] as! String)!)
+                let idDrink = NSNumber(value: Int32(cocktail["idDrink"] as! String)! as Int32)
                 CocktailsAPI.sharedInstance().getCocktailById(idDrink) {success, arrayOfCocktailDictionary, errorString in
                     if errorString == nil {
                         strCategory = (arrayOfCocktailDictionary![0] as? [String: AnyObject])!["strCategory"] as! String
@@ -178,12 +178,12 @@ extension TableViewController {
         tableView.reloadData()
     }
     
-    func filterContentForName(searchText: String) {
+    func filterContentForName(_ searchText: String) {
         var strDrink = ""
         cocktailsInstance.cocktails = cocktailsInstance.cocktails.filter({( cocktail : [String: AnyObject]) -> Bool in
             
             if cocktail["strDrink"] == nil {
-                let idDrink = NSNumber(int:Int32(cocktail["idDrink"] as! String)!)
+                let idDrink = NSNumber(value: Int32(cocktail["idDrink"] as! String)! as Int32)
                 CocktailsAPI.sharedInstance().getCocktailById(idDrink) {success, arrayOfCocktailDictionary, errorString in
                     if errorString == nil {
                         strDrink = (arrayOfCocktailDictionary![0] as? [String: AnyObject])!["strDrink"] as! String
@@ -193,7 +193,7 @@ extension TableViewController {
                 strDrink = cocktail["strDrink"] as! String
             }
             
-            return strDrink.lowercaseString.containsString(searchText.lowercaseString)
+            return strDrink.lowercased().contains(searchText.lowercased())
         })
         tableView.reloadData()
     }
@@ -201,7 +201,7 @@ extension TableViewController {
 
 extension TableViewController: UISearchBarDelegate {
     // MARK: - UISearchBar Delegate
-    func searchBar(searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
+    func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         let searchBar = searchController.searchBar
         var category = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
         
@@ -210,12 +210,12 @@ extension TableViewController: UISearchBarDelegate {
                 if success == false {
                     //if let errorString = errorString {
                     if errorString != nil {
-                        dispatch_async(dispatch_get_main_queue(),{
+                        DispatchQueue.main.async(execute: {
                             self.showError("", errorMessage: errorString!)
                         })
                     }
                 } else {
-                    dispatch_async(dispatch_get_main_queue()) {
+                    DispatchQueue.main.async {
                         self.reloadTable()
                     }
                 }
@@ -232,33 +232,33 @@ extension TableViewController: UISearchBarDelegate {
                 if success == false {
                     //if let errorString = errorString {
                     if errorString != nil {
-                        dispatch_async(dispatch_get_main_queue(),{
+                        DispatchQueue.main.async(execute: {
                             self.showError("", errorMessage: errorString!)
                         })
                     }
                 } else {
-                    dispatch_async(dispatch_get_main_queue()) {
+                    DispatchQueue.main.async {
                         self.reloadTable()
                     }
                 }
             }
         }
         self.filterContentForName(self.searchController.searchBar.text!)
-        NSUserDefaults.standardUserDefaults().setInteger(selectedScope, forKey: "Category")
+        UserDefaults.standard.set(selectedScope, forKey: "Category")
     }
     
-    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.selectedScopeButtonIndex = 0
         searchBar.text = ""
         
-        NSUserDefaults.standardUserDefaults().setObject("", forKey: "SearchText")
-        NSUserDefaults.standardUserDefaults().setInteger(0, forKey: "Category")
+        UserDefaults.standard.set("", forKey: "SearchText")
+        UserDefaults.standard.set(0, forKey: "Category")
     }
 }
 
 extension TableViewController: UISearchResultsUpdating {
     // MARK: - UISearchResultsUpdating Delegate
-    func updateSearchResultsForSearchController(searchController: UISearchController) {
+    func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
         let category = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
         
@@ -266,18 +266,18 @@ extension TableViewController: UISearchResultsUpdating {
             if success == false {
                 //if let errorString = errorString {
                 if errorString != nil {
-                    dispatch_async(dispatch_get_main_queue(),{
+                    DispatchQueue.main.async(execute: {
                         self.showError("", errorMessage: errorString!)
                     })
                 }
             } else {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     self.reloadTable()
                 }
             }
         }
         self.filterContentForCategory(category)
         
-        NSUserDefaults.standardUserDefaults().setObject(searchController.searchBar.text!, forKey: "SearchText")
+        UserDefaults.standard.set(searchController.searchBar.text!, forKey: "SearchText")
     }
 }

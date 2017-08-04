@@ -11,7 +11,7 @@ import Foundation
 class CocktailsAPI {
     
     /* Shared session */
-    var session: NSURLSession
+    var session: URLSession
     
     // MARK: - Shared Instance
     
@@ -27,103 +27,108 @@ class CocktailsAPI {
     
     /* default initializer */
     init() {
-        session = NSURLSession.sharedSession()
+        session = URLSession.shared
     }
     
-    func getCocktailsByName(cocktailName: String, completionHandler: (success: Bool, arrayOfCocktailDictionaies: [AnyObject]?, errorString: String?) -> Void) {
+    func getCocktailsByName(_ cocktailName: String, completionHandler: @escaping (_ success: Bool, _ arrayOfCocktailDictionaies: [AnyObject]?, _ errorString: String?) -> Void) {
         
         let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.searchMethod + "?" + CocktailsAPI.Constants.searchOption + "=" + cocktailName
         
         taskForGETMethod(baseURL) { JSONResult, error in
             if let error = error {
                 // Set error string to localizedDescription in error
-                completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: error.localizedDescription)
+                completionHandler(false, nil, error.localizedDescription)
             } else {
                 // parse the json response which looks like the following:
-                if let arrayOfCocktailDicts = JSONResult.valueForKey("drinks") as? [AnyObject] {
-                    completionHandler(success: true, arrayOfCocktailDictionaies: arrayOfCocktailDicts, errorString: nil)
+                if let arrayOfCocktailDicts = JSONResult?.value(forKey: "drinks") as? [AnyObject] {
+                    completionHandler(true, arrayOfCocktailDicts, nil)
                 } else {
-                    completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: "No results from server.")
+                    completionHandler(false, nil, "No results from server.")
                 }
             }
         }
     }
     
-    func getCocktailsByCategory(cocktailCategory: String, completionHandler: (success: Bool, arrayOfCocktailDictionaies: [AnyObject]?, errorString: String?) -> Void) {
+    func getCocktailsByCategory(_ cocktailCategory: String, completionHandler: @escaping (_ success: Bool, _ arrayOfCocktailDictionaies: [AnyObject]?, _ errorString: String?) -> Void) {
         
         let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.filterMethod + "?" + CocktailsAPI.Constants.categoryOption + "=" + cocktailCategory
         
         taskForGETMethod(baseURL) { JSONResult, error in
             if let error = error {
                 // Set error string to localizedDescription in error
-                completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: error.localizedDescription)
+                completionHandler(false, nil, error.localizedDescription)
             } else {
                 // parse the json response which looks like the following:
-                if let arrayOfCocktailDicts = JSONResult.valueForKey("drinks") as? [AnyObject] {
-                    completionHandler(success: true, arrayOfCocktailDictionaies: arrayOfCocktailDicts, errorString: nil)
+                if let arrayOfCocktailDicts = JSONResult?.value(forKey: "drinks") as? [AnyObject] {
+                    completionHandler(true, arrayOfCocktailDicts, nil)
                 } else {
-                    completionHandler(success: false, arrayOfCocktailDictionaies: nil, errorString: "No results from server.")
+                    completionHandler(false, nil, "No results from server.")
                 }
             }
         }
     }
     
-    func getCocktailCategories(completionHandler: (success: Bool, arrayOfCategoriesDictionary: [AnyObject]?, errorString: String?) -> Void) {
+    func getCocktailCategories(_ completionHandler: @escaping (_ success: Bool, _ arrayOfCategoriesDictionary: [AnyObject]?, _ errorString: String?) -> Void) {
         let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.listMethod + "?" + CocktailsAPI.Constants.categoryOption + "=" + CocktailsAPI.Constants.listValue
         
         taskForGETMethod(baseURL) { JSONResult, error in
             if let error = error {
                 // Set error string to localizedDescription in error
-                completionHandler(success: false, arrayOfCategoriesDictionary: nil, errorString: error.localizedDescription)
+                completionHandler(false, nil, error.localizedDescription)
             } else {
                 // parse the json response which looks like the following:
-                if let arrayOfCategoriesDicts = JSONResult.valueForKey("drinks") as? [AnyObject] {
-                    completionHandler(success: true, arrayOfCategoriesDictionary: arrayOfCategoriesDicts, errorString: nil)
+                if let arrayOfCategoriesDicts = JSONResult?.value(forKey: "drinks") as? [AnyObject] {
+                    completionHandler(true, arrayOfCategoriesDicts, nil)
                 } else {
-                    completionHandler(success: false, arrayOfCategoriesDictionary: nil, errorString: "No results from server.")
+                    completionHandler(false, nil, "No results from server.")
                 }
             }
         }
     }
     
-    func getCocktailById(idDrink: NSNumber, completionHandler: (success: Bool, arrayOfCocktailDictionary: [AnyObject]?, errorString: String?) -> Void) {
+    func getCocktailById(_ idDrink: NSNumber, completionHandler: @escaping (_ success: Bool, _ arrayOfCocktailDictionary: [AnyObject]?, _ errorString: String?) -> Void) {
         
-        let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.lookupMethod + "?" + CocktailsAPI.Constants.lookupOption + "=" + String(idDrink)
-        
+        let baseURL = CocktailsAPI.Constants.baseURL + CocktailsAPI.Constants.parseType + "/v" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.apiVersion + "/" + CocktailsAPI.Constants.lookupMethod + "?" + CocktailsAPI.Constants.lookupOption + "=" + String(describing: idDrink)
+//        let baseURL = "https://192.168.0.102:8080/CocktailsAPI/cocktail/" + String(describing: idDrink)
+//        let baseURL = "http://localhost:8080/CocktailsAPI/cocktail/" + String(describing: idDrink)
+        print(baseURL)
         taskForGETMethod(baseURL) { JSONResult, error in
             if let error = error {
                 // Set error string to localizedDescription in error
-                completionHandler(success: false, arrayOfCocktailDictionary: nil, errorString: error.localizedDescription)
+                completionHandler(false, nil, error.localizedDescription)
             } else {
                 // parse the json response which looks like the following:
-                if let arrayOfCocktailDicts = JSONResult.valueForKey("drinks") as? [AnyObject] {
-                    completionHandler(success: true, arrayOfCocktailDictionary: arrayOfCocktailDicts, errorString: nil)
+                if let arrayOfCocktailDicts = JSONResult?.value(forKey: "drinks") as? [AnyObject] {
+                    completionHandler(true, arrayOfCocktailDicts, nil)
                 } else {
-                    completionHandler(success: false, arrayOfCocktailDictionary: nil, errorString: "No results from server.")
+                    completionHandler(false, nil, "No results from server.")
                 }
             }
         }
     }
     
-    func taskForImageDownload(photoURL: String, completionHandler: (imageData: NSData?, errorString: String?) -> Void) {
-        let photoURL = photoURL.stringByReplacingOccurrencesOfString("http:", withString: "https:")
+    func taskForImageDownload(_ photoURL: String, completionHandler: @escaping (_ imageData: Data?, _ errorString: String?) -> Void) {
+        let photoURL = photoURL.replacingOccurrences(of: "http:", with: "https:")
         taskForGetMethod(photoURL) { (data, error) in
             if let _ = error {
-                completionHandler(imageData: nil, errorString: "Failed to download photo with url \(photoURL)")
+                completionHandler(nil, "Failed to download photo with url \(photoURL)")
             } else {
-                completionHandler(imageData: data, errorString: nil)
+                completionHandler(data, nil)
             }
         }
     }
     
-    func taskForGETMethod(baseUrl: String, completionHandler: (result: AnyObject!, error: NSError?) -> Void) -> NSURLSessionDataTask {
+    func taskForGETMethod(_ baseUrl: String, completionHandler: @escaping (_ result: AnyObject?, _ error: NSError?) -> Void) -> URLSessionDataTask {
         
-        let url = NSURL(string: baseUrl.stringByAddingPercentEncodingWithAllowedCharacters( NSCharacterSet.URLQueryAllowedCharacterSet())!)!
-        let request = NSMutableURLRequest(URL: url)
-        let task = session.dataTaskWithRequest(request) {data, response, downloadError in
+        let url = URL(string: baseUrl.addingPercentEncoding( withAllowedCharacters: CharacterSet.urlQueryAllowed)!)!
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        let task = session.dataTask(with: request)  {data, response, downloadError in
             if let error = downloadError {
-                let newError = CocktailsAPI.errorForData(data, response: response, error: error)
-                completionHandler(result: nil, error: newError)
+                let newError = CocktailsAPI.errorForData(data, response: response, error: error as NSError)
+                completionHandler(nil, newError)
             } else {
                 // success
                 let returnData = data
@@ -134,20 +139,20 @@ class CocktailsAPI {
         return task
     }
     
-    func taskForGetMethod(urlString: String/*, queryParameters: [String: AnyObject]?*/, completionHandler:(data: NSData?, error: NSError?) -> Void) -> NSURLSessionDataTask{
+    func taskForGetMethod(_ urlString: String, completionHandler:@escaping (_ data: Data?, _ error: NSError?) -> Void) -> URLSessionDataTask{
         
         //build and configure Get request
         //let urlString = urlString + escapedParameters(queryParameters!)
-        let url = NSURL(string: urlString)!
+        let url = URL(string: urlString)!
         
-        let request = NSMutableURLRequest(URL: url)
-        request.HTTPMethod = "GET"
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
         
         //make the request
-        let task = session.dataTaskWithRequest(request){ (data, response, error) in
+        let task = session.dataTask(with: request) { (data, response, error) in
             
-            if self.isSuccess(data, response: response, error: error, completionHandler: completionHandler) {
-                completionHandler(data: data, error: nil)
+            if self.isSuccess(data, response: response, error: error as NSError?, completionHandler: completionHandler) {
+                completionHandler(data, nil)
             }
         }
         
@@ -157,7 +162,7 @@ class CocktailsAPI {
         return task
     }
     
-    func escapedParameters(parameters: [String : AnyObject]) -> String {
+    func escapedParameters(_ parameters: [String : AnyObject]) -> String {
         
         var urlVars = [String]()
         
@@ -167,45 +172,45 @@ class CocktailsAPI {
             let stringValue = "\(value)"
             
             /* Escape it */
-            let escapedValue = stringValue.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
+            let escapedValue = stringValue.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
             
             /* Append it */
             urlVars += [key + "=" + "\(escapedValue!)"]
             
         }
         
-        return (!urlVars.isEmpty ? "?" : "") + urlVars.joinWithSeparator("&")
+        return (!urlVars.isEmpty ? "?" : "") + urlVars.joined(separator: "&")
     }
     
     /* Helper: Given a response with error, see if a status_message is returned, otherwise return the previous error */
-    class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
+    class func errorForData(_ data: Data?, response: URLResponse?, error: NSError) -> NSError {
         return error
     }
     
     /* Helper: Given raw JSON, return a usable Foundation object */
-    class func parseJSONWithCompletionHandler(data: NSData, completionHandler: (result: AnyObject!, error: NSError?) -> Void) {
+    class func parseJSONWithCompletionHandler(_ data: Data, completionHandler: (_ result: AnyObject?, _ error: NSError?) -> Void) {
         var parsingError: NSError? = nil
         
-        let parsedResult: AnyObject?
+        let parsedResult: Any?
         do {
-            parsedResult = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments)
+            parsedResult = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
         } catch let error as NSError {
             parsingError = error
             parsedResult = nil
         }
         
         if let error = parsingError {
-            completionHandler(result: nil, error: error)
+            completionHandler(nil, error)
         } else {
-            completionHandler(result: parsedResult, error: nil)
+            completionHandler(parsedResult as AnyObject?, nil)
         }
     }
     
-    func isSuccess(data: NSData?, response: NSURLResponse?, error: NSError?, completionHandler: (data: NSData?, error: NSError?) -> Void) -> Bool {
+    func isSuccess(_ data: Data?, response: URLResponse?, error: NSError?, completionHandler: (_ data: Data?, _ error: NSError?) -> Void) -> Bool {
         
         guard error == nil else {
-            NSLog("There was an error with your request: \(error)")
-            completionHandler(data: nil, error: error)
+            NSLog("There was an error with your request: \(String(describing: error))")
+            completionHandler(nil, error)
             return false
         }
         
@@ -213,13 +218,13 @@ class CocktailsAPI {
             let errorMessage = "No data was returned by the request!"
             NSLog(errorMessage)
             let userInfo = [NSLocalizedDescriptionKey : errorMessage]
-            completionHandler(data: nil, error: NSError(domain: "isSuccess", code: 1, userInfo: userInfo))
+            completionHandler(nil, NSError(domain: "isSuccess", code: 1, userInfo: userInfo))
             return false
         }
         
-        guard let statusCode = (response as? NSHTTPURLResponse)?.statusCode where statusCode >= 200 && statusCode <= 299 else {
+        guard let statusCode = (response as? HTTPURLResponse)?.statusCode , statusCode >= 200 && statusCode <= 299 else {
             var errorMessage : String
-            if let response = response as? NSHTTPURLResponse {
+            if let response = response as? HTTPURLResponse {
                 errorMessage = "Your request returned an invalid response! Status code \(response.statusCode)!"
             } else if let response = response {
                 errorMessage = "Your request returned an invalid response! Response \(response)!"
@@ -229,7 +234,7 @@ class CocktailsAPI {
             
             NSLog(errorMessage)
             let userInfo = [NSLocalizedDescriptionKey : errorMessage]
-            completionHandler(data: data, error: NSError(domain: "isSuccess", code: 1, userInfo: userInfo))
+            completionHandler(data, NSError(domain: "isSuccess", code: 1, userInfo: userInfo))
             return false
         }
         

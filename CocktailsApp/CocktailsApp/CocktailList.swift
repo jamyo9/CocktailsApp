@@ -27,38 +27,38 @@ class CocktailList {
     }
     
     func reset() {
-        cocktails.removeAll(keepCapacity: false)
+        cocktails.removeAll(keepingCapacity: false)
     }
     
-    func getCocktailsByName(cocktailName: String, completion: (result: Bool, errorString: String?) -> Void) {
+    func getCocktailsByName(_ cocktailName: String, completion: @escaping (_ result: Bool, _ errorString: String?) -> Void) {
         
         CocktailsAPI.sharedInstance().getCocktailsByName(cocktailName) { success, arrayOfCocktailDictionaies, errorString in
             if errorString == nil {
                 self.reset()
                 self.cocktails = (arrayOfCocktailDictionaies as? [[String: AnyObject]])!
-                completion(result:true, errorString: nil)
+                completion(true, nil)
             } else {
                 NSLog("error getCocktailsByName()")
-                completion(result:false, errorString: errorString)
+                completion(false, errorString)
             }
         }
     }
     
-    func getCocktailsByCategory(cocktailCategory: String, completion: (result: Bool, errorString: String?) -> Void) {
+    func getCocktailsByCategory(_ cocktailCategory: String, completion: @escaping (_ result: Bool, _ errorString: String?) -> Void) {
         
         CocktailsAPI.sharedInstance().getCocktailsByCategory(cocktailCategory) { success, arrayOfCocktailDictionaies, errorString in
             if errorString == nil {
                 self.reset()
                 self.cocktails = (arrayOfCocktailDictionaies as? [[String: AnyObject]])!
-                completion(result:true, errorString: nil)
+                completion(true, nil)
             } else {
                 NSLog("error getCocktailsByCategory()")
-                completion(result:false, errorString: errorString)
+                completion(false, errorString)
             }
         }
     }
     
-    func parseCocktail(cocktailDictionary: [String: AnyObject], isFavorite: Bool) -> Cocktail {
+    func parseCocktail(_ cocktailDictionary: [String: AnyObject], isFavorite: Bool) -> Cocktail {
         var ingredients = Set<Ingredient>()
         var measures = Set<Measure>()
         
@@ -78,8 +78,8 @@ class CocktailList {
         
         // create a position object and add it to this object's collection.
         let cocktail = Cocktail(dictionary: cocktailDictionary, isFavorite: isFavorite, context: self.context)
-        cocktail.ingredients = ingredients
-        cocktail.measures = measures
+        cocktail.ingredients = ingredients as NSSet?
+        cocktail.measures = measures as NSSet?
         
         CoreDataStack.sharedInstance.saveContext()
         

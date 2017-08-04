@@ -23,17 +23,17 @@ class CocktailDetailViewController: UIViewController {
     var cocktail: Cocktail?
     var cocktailDictionary: [String: AnyObject]?
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         if self.cocktail == nil {
-            let idDrink = NSNumber(int:Int32(cocktailDictionary!["idDrink"] as! String)!)
+            let idDrink = NSNumber(value: Int32(cocktailDictionary!["idDrink"] as! String)! as Int32)
             self.activityIndicator.startAnimating()
                     
             CocktailsAPI.sharedInstance().getCocktailById(idDrink) { success, arrayOfCocktailDictionary, errorString in
                 if errorString == nil {
                     if let cocktailDictionary = arrayOfCocktailDictionary![0] as? [String: AnyObject] {
-                        dispatch_async(dispatch_get_main_queue()) {
+                        DispatchQueue.main.async {
                             self.configureView(cocktailDictionary)
                         }
                     } else {
@@ -52,7 +52,7 @@ class CocktailDetailViewController: UIViewController {
                 CocktailsAPI.sharedInstance().getCocktailById((self.cocktail!.idDrink)!) { success, arrayOfCocktailDictionary, errorString in
                     if errorString == nil {
                         if let cocktailDictionary = arrayOfCocktailDictionary![0] as? [String: AnyObject] {                            
-                            dispatch_async(dispatch_get_main_queue()) {
+                            DispatchQueue.main.async {
                                 self.configureView(cocktailDictionary)
                             }
                         } else {
@@ -64,18 +64,18 @@ class CocktailDetailViewController: UIViewController {
                     }
                 }
             } else {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     self.configureView()
                 }
             }
         }
     }
     
-    func favoriteAction(sender: AnyObject) {
+    func favoriteAction(_ sender: AnyObject) {
         if self.cocktail == nil {
             self.cocktail = CocktailList.sharedInstance().parseCocktail(self.cocktailDictionary!, isFavorite: true)
         } else {
-            self.context.deleteObject(self.cocktail!)
+            self.context.delete(self.cocktail!)
             CoreDataStack.sharedInstance.saveContext()
         }
         
@@ -87,35 +87,35 @@ extension CocktailDetailViewController {
     
     func configureView() {
         if let detailCocktail = cocktail {
-            if let titleLabel = titleLabel, cocktailImageView = cocktailImageView, detailDescriptionLabel = detailDescriptionLabel, activityIndicator = activityIndicator {
+            if let titleLabel = titleLabel, let cocktailImageView = cocktailImageView, let detailDescriptionLabel = detailDescriptionLabel, let activityIndicator = activityIndicator {
                 titleLabel.text = detailCocktail.strDrink
-                titleLabel.font = UIFont.boldSystemFontOfSize(20.0)
+                titleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
                 
                 if (detailCocktail.drinkThumb == nil ) {
                     if (detailCocktail.strDrinkThumb != nil) {
                         CocktailsAPI.sharedInstance().taskForImageDownload(detailCocktail.strDrinkThumb!) { imageData, error in
                             if let data = imageData {
                                     detailCocktail.drinkThumb = data
-                                dispatch_async(dispatch_get_main_queue()) {
+                                DispatchQueue.main.async {
                                     cocktailImageView.image = UIImage(data: data)
                                     activityIndicator.stopAnimating()
                                 }
                             } else {
-                                dispatch_async(dispatch_get_main_queue()) {
+                                DispatchQueue.main.async {
                                     activityIndicator.stopAnimating()
                                     cocktailImageView.image = UIImage(named: "no-image")
                                 }
                             }
                         }
                     } else {
-                        dispatch_async(dispatch_get_main_queue()) {
+                        DispatchQueue.main.async {
                             activityIndicator.stopAnimating()
                             cocktailImageView.image = UIImage(named: "no-image")
                         }
                     }
                 } else {
-                    cocktailImageView.image = UIImage(data: detailCocktail.drinkThumb!)
-                    dispatch_async(dispatch_get_main_queue()) {
+                    cocktailImageView.image = UIImage(data: detailCocktail.drinkThumb! as Data)
+                    DispatchQueue.main.async {
                         activityIndicator.stopAnimating()
                     }
                 }
@@ -126,32 +126,32 @@ extension CocktailDetailViewController {
         configFavoriteCocktailButton()
     }
     
-    func configureView(cocktailDictionary: [String: AnyObject]) {
-            if let titleLabel = titleLabel, cocktailImageView = cocktailImageView, detailDescriptionLabel = detailDescriptionLabel, activityIndicator = activityIndicator {
+    func configureView(_ cocktailDictionary: [String: AnyObject]) {
+            if let titleLabel = titleLabel, let cocktailImageView = cocktailImageView, let detailDescriptionLabel = detailDescriptionLabel, let activityIndicator = activityIndicator {
                 
                 let strDrinkThumb = cocktailDictionary["strDrinkThumb"] as? String
                 let strDrink = cocktailDictionary["strDrink"] as? String
 
                 
                 titleLabel.text = strDrink
-                titleLabel.font = UIFont.boldSystemFontOfSize(20.0)
+                titleLabel.font = UIFont.boldSystemFont(ofSize: 20.0)
                 
                 if (strDrinkThumb != nil) {
                     CocktailsAPI.sharedInstance().taskForImageDownload(strDrinkThumb!) { imageData, error in
                         if let data = imageData {
-                            dispatch_async(dispatch_get_main_queue()) {
+                            DispatchQueue.main.async {
                                 cocktailImageView.image = UIImage(data: data)
                                 activityIndicator.stopAnimating()
                             }
                         } else {
-                            dispatch_async(dispatch_get_main_queue()) {
+                            DispatchQueue.main.async {
                                 activityIndicator.stopAnimating()
                                 cocktailImageView.image = UIImage(named: "no-image")
                             }
                         }
                     }
                 } else {
-                    dispatch_async(dispatch_get_main_queue()) {
+                    DispatchQueue.main.async {
                         activityIndicator.stopAnimating()
                         cocktailImageView.image = UIImage(named: "no-image")
                     }
@@ -159,7 +159,7 @@ extension CocktailDetailViewController {
             detailDescriptionLabel.text = createDescription(cocktailDictionary)
         }
         
-        let idDrink = NSNumber(int:Int32(cocktailDictionary["idDrink"] as! String)!)
+        let idDrink = NSNumber(value: Int32(cocktailDictionary["idDrink"] as! String)! as Int32)
         let cocktails = CoreDataStack.sharedInstance.getCocktailsById(idDrink)
         if cocktails.count > 0 {
             self.cocktail = cocktails[0]
@@ -169,9 +169,9 @@ extension CocktailDetailViewController {
     
     func configFavoriteCocktailButton() {
         if(self.cocktail?.isFavorite == true) {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Trash, target: self, action: #selector(CocktailDetailViewController.favoriteAction(_:)))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(CocktailDetailViewController.favoriteAction(_:)))
         } else {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(CocktailDetailViewController.favoriteAction(_:)))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(CocktailDetailViewController.favoriteAction(_:)))
         }
     }
     
@@ -205,7 +205,7 @@ extension CocktailDetailViewController {
         return description
     }
     
-    func createDescription(cocktailDictionary: [String: AnyObject]) -> String {
+    func createDescription(_ cocktailDictionary: [String: AnyObject]) -> String {
         let strCategory = cocktailDictionary["strCategory"] as? String
         let strAlcoholic = cocktailDictionary["strAlcoholic"] as? String
         let strGlass = cocktailDictionary["strGlass"] as? String
@@ -253,7 +253,7 @@ extension CocktailDetailViewController {
         return description
     }
     
-    func showError(errorCode: String, errorMessage: String?){
+    func showError(_ errorCode: String, errorMessage: String?){
         let titleString = "Error"
         var errorString = ""
         errorString = errorMessage!
@@ -261,15 +261,15 @@ extension CocktailDetailViewController {
     }
     
     //Function that configures and shows an alert
-    func showAlert(alertTitle: String, alertMessage: String, actionTitle: String){
+    func showAlert(_ alertTitle: String, alertMessage: String, actionTitle: String){
         
         /* Configure the alert view to display the error */
-        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .Alert)
-        let cancelAction = UIAlertAction(title: actionTitle, style: .Cancel, handler: nil)
+        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: actionTitle, style: .cancel, handler: nil)
         alert.addAction(cancelAction)
         
         /* Present the alert view */
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
     
 }

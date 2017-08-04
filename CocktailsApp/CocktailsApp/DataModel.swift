@@ -10,15 +10,15 @@ import CoreData
 
 class DataModel: NSObject {
     
-    private class var defaultCenter: NSNotificationCenter {
-        return NSNotificationCenter.defaultCenter()
+    fileprivate class var defaultCenter: NotificationCenter {
+        return NotificationCenter.default
     }
     
-    private class var context: NSManagedObjectContext {
+    fileprivate class var context: NSManagedObjectContext {
         return CoreDataStack.sharedInstance.context
     }
     
-    private class func saveContext() {
+    fileprivate class func saveContext() {
         CoreDataStack.sharedInstance.saveContext()
     }
     

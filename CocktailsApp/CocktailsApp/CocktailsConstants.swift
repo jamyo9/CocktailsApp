@@ -18,6 +18,7 @@ extension CocktailsAPI {
         
         // MARK: URLs
         static let baseURL : String = "https://www.thecocktaildb.com/api/"
+//        static let baseURL : String = "http://localhost:8080/CocktailsAPI/"
         static let parseType : String = "json"
         static let apiVersion : String = "1"
         
